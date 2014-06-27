@@ -10,6 +10,7 @@ import android.os.Message;
 import android.util.Pair;
 
 import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
 
 import java.io.IOException;
 import java.net.URL;
@@ -57,7 +58,8 @@ public class NetworkService extends Service implements Handler.Callback {
             case Opcodes.GET_URL:
                 Pair<URL, Handler> args = (Pair<URL, Handler>) msg.obj;
                 try {
-                    args.second.sendMessage(args.second.obtainMessage(Opcodes.GET_URL, Jsoup.parse(args.first, 10000)));
+                    final Document result = Jsoup.parse(args.first.openStream(), "windows-1251", args.first.toString());
+                    args.second.sendMessage(args.second.obtainMessage(Opcodes.GET_URL, result));
                 } catch (IOException e) {
                     args.second.sendMessage(args.second.obtainMessage(Opcodes.NETWORK_ERROR, R.string.network_error, 0, null));
                 }

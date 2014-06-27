@@ -6,12 +6,10 @@ import android.os.Message;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Adapter;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
-import android.widget.SpinnerAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -36,7 +34,7 @@ public class SelectorFragment extends BaseFragment {
         View rootView = inflater.inflate(R.layout.institution_selector_fragment, container, false);
 
         mInstSelector = (Spinner) rootView.findViewById(R.id.institution_spinner);
-        mInstSelector.setAdapter(new ArrayAdapter<String>(getActivity(), android.R.layout.simple_spinner_item, getResources().getStringArray(R.array.institutions_array)));
+        mInstSelector.setAdapter(new ArrayAdapter<String>(getActivity(), R.layout.tall_list_item, getResources().getStringArray(R.array.institutions_array)));
         mInstSelector.setOnItemSelectedListener(mInstSelectListener);
 
         mSpinnersHolder = (LinearLayout) rootView.findViewById(R.id.spinners_container);
@@ -76,8 +74,17 @@ public class SelectorFragment extends BaseFragment {
     private void setLayoutSpbu(final Element tree) {
         // ul --> [li --> div, ul]
         final Elements childListItems = tree.children(); // list of `li`s
-        if(childListItems.size() == 1 && tree.select("ul").size() == 0) // this is final subtree
+        if(tree.children().select("ul").size() == 0) { // this is final subtree
+            final Elements divs = tree.select("div");
+            for(final Element div : divs) {
+                final TextView link = (TextView) LayoutInflater.from(getActivity()).inflate(R.layout.link_item, mSpinnersHolder, false);
+                final String url = div.select("a[href]").attr("href");
+                link.setText(div.text());
+                link.setOnClickListener(null);
+                mSpinnersHolder.addView(link);
+            }
             return;
+        }
 
         final Spinner levelSelector = new Spinner(getActivity());
         final ElementAdapter elementAdapter = new ElementAdapter(getActivity(), childListItems);
@@ -103,7 +110,7 @@ public class SelectorFragment extends BaseFragment {
     private static class ElementAdapter extends ArrayAdapter<Element> {
 
         public ElementAdapter(Context context, Elements objects) {
-            super(context, android.R.layout.simple_spinner_item, objects);
+            super(context, R.layout.tall_list_item, objects);
         }
 
         @Override
@@ -121,17 +128,26 @@ public class SelectorFragment extends BaseFragment {
 
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
+            return newView(position, convertView, parent);
+        }
+
+        @Override
+        public View getDropDownView(int position, View convertView, ViewGroup parent) {
+            return newView(position, convertView, parent);
+        }
+
+        private View newView(int position, View convertView, ViewGroup parent) {
             final View view;
             final TextView text;
             final Element item = getItem(position);
 
             if (convertView == null)
-                view = LayoutInflater.from(getContext()).inflate(android.R.layout.simple_spinner_item, parent, false);
+                view = LayoutInflater.from(getContext()).inflate(R.layout.tall_list_item, parent, false);
             else
                 view = convertView;
 
             text = (TextView) view.findViewById(android.R.id.text1);
-            text.setText(item == null ? getContext().getString(R.string.select_from_list) : item.child(0).text());
+            text.setText(item == null ? getContext().getString(R.string.select_from_list) : item.child(0).text().substring(1));
 
             return view;
         }
