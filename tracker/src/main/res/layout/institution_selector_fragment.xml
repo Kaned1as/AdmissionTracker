@@ -4,13 +4,24 @@
     android:layout_height="match_parent"
     tools:context=".MainFlow$PlaceholderFragment">
 
-    <TextView
+    <Spinner
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceMedium"
-        android:text="Medium Text"
-        android:id="@+id/textView"
-        android:layout_alignParentTop="true"
+        android:id="@+id/institution_spinner"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="117dp" />
+        android:layout_marginTop="50dp"
+        android:prompt="@string/select_institution"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp" />
+
+    <LinearLayout
+        android:animateLayoutChanges="true"
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/institution_spinner"
+        android:layout_centerHorizontal="true"
+        android:layout_margin="40dp"
+        android:id="@+id/spinners_container"/>
+
 </RelativeLayout>
