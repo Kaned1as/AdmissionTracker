@@ -5,7 +5,7 @@
     tools:context=".MainFlow$PlaceholderFragment">
 
     <Spinner
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/institution_spinner"
         android:layout_centerHorizontal="true"

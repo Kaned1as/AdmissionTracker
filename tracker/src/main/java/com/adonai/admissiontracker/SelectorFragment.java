@@ -1,5 +1,6 @@
 package com.adonai.admissiontracker;
 
+import android.app.FragmentTransaction;
 import android.content.Context;
 import android.os.Bundle;
 import android.os.Message;
@@ -14,13 +15,10 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.adonai.admissiontracker.entities.FavoriteHolder;
-import com.google.gson.Gson;
 
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
-
-import java.util.Arrays;
 
 /**
  * A placeholder fragment containing a simple view.
@@ -88,14 +86,13 @@ public class SelectorFragment extends BaseFragment {
                 link.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        final FavoriteHolder holder = new FavoriteHolder();
-                        holder.title = div.text();
-                        holder.url = url;
+                        final FavoriteHolder holder = new FavoriteHolder(div.text(), url);
+                        FavoriteHolder.addFavorite(getMainActivity().getPreferences(), holder);
 
-                        final String existingPrefs = getMainActivity().getPreferences().getString(Utils.FAVORITES_PREF, "");
-                        getMainActivity().getPreferences()
-                            .edit()
-                                .putString(Utils.FAVORITES_PREF, Utils.join(Arrays.asList(existingPrefs, new Gson().toJson(holder)), Utils.DELIMITER))
+                        getFragmentManager()
+                            .beginTransaction()
+                                .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
+                                .replace(R.id.container, new SelectorFragment())
                             .commit();
                     }
                 });
@@ -125,7 +122,7 @@ public class SelectorFragment extends BaseFragment {
         mSpinnersHolder.addView(levelSelector);
     }
 
-    private static class ElementAdapter extends ArrayAdapter<Element> {
+    public static class ElementAdapter extends ArrayAdapter<Element> {
 
         public ElementAdapter(Context context, Elements objects) {
             super(context, R.layout.tall_list_item, objects);
@@ -154,7 +151,7 @@ public class SelectorFragment extends BaseFragment {
             return newView(position, convertView, parent);
         }
 
-        private View newView(int position, View convertView, ViewGroup parent) {
+        public View newView(int position, View convertView, ViewGroup parent) {
             final View view;
             final TextView text;
             final Element item = getItem(position);

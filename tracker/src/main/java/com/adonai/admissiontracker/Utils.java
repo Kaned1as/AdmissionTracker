@@ -7,10 +7,10 @@ import java.util.Iterator;
  * Created by adonai on 27.06.14.
  */
 public class Utils {
-    static final String DELIMITER = "--|--";
-    static final String FAVORITES_PREF = "favorites";
+    public static final String DELIMITER = "--|--";
+    public static final String FAVORITES_PREF = "favorites";
 
-    static String join(Collection<String> s, String delimiter)
+    public static String join(Collection<String> s, String delimiter)
     {
         StringBuilder builder = new StringBuilder();
         Iterator<String> iter = s.iterator();
