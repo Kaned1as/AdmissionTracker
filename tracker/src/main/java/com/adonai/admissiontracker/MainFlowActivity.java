@@ -4,8 +4,10 @@ import android.app.Activity;
 import android.content.ComponentName;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.preference.PreferenceManager;
 import android.view.Menu;
 import android.view.MenuItem;
 
@@ -80,5 +82,9 @@ public class MainFlowActivity extends Activity {
      */
     public NetworkService getService() {
         return mService;
+    }
+
+    public SharedPreferences getPreferences() {
+        return PreferenceManager.getDefaultSharedPreferences(this);
     }
 }

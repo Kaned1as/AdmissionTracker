@@ -13,9 +13,14 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.adonai.admissiontracker.entities.FavoriteHolder;
+import com.google.gson.Gson;
+
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+
+import java.util.Arrays;
 
 /**
  * A placeholder fragment containing a simple view.
@@ -80,7 +85,20 @@ public class SelectorFragment extends BaseFragment {
                 final TextView link = (TextView) LayoutInflater.from(getActivity()).inflate(R.layout.link_item, mSpinnersHolder, false);
                 final String url = div.select("a[href]").attr("href");
                 link.setText(div.text());
-                link.setOnClickListener(null);
+                link.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        final FavoriteHolder holder = new FavoriteHolder();
+                        holder.title = div.text();
+                        holder.url = url;
+
+                        final String existingPrefs = getMainActivity().getPreferences().getString(Utils.FAVORITES_PREF, "");
+                        getMainActivity().getPreferences()
+                            .edit()
+                                .putString(Utils.FAVORITES_PREF, Utils.join(Arrays.asList(existingPrefs, new Gson().toJson(holder)), Utils.DELIMITER))
+                            .commit();
+                    }
+                });
                 mSpinnersHolder.addView(link);
             }
             return;

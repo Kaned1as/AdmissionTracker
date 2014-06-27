@@ -21,5 +21,6 @@ android {
 
 dependencies {
     compile 'org.jsoup:jsoup:+'
+    compile 'com.google.code.gson:gson:+'
     compile fileTree(dir: 'libs', include: ['*.jar'])
 }
