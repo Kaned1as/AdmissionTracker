@@ -7,4 +7,5 @@
     <string name="network_error">Ошибка сети</string>
     <string name="wait_please">Пожалуйста, подождите…</string>
     <string name="retrieving_data">Загрузка данных…</string>
+    <string name="select_from_list">Выберите из списка</string>
 </resources>

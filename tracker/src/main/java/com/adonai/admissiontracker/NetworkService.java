@@ -16,7 +16,7 @@ import java.net.URL;
 
 public class NetworkService extends Service implements Handler.Callback {
 
-    private Handler mHandler;
+    private Handler mNetworkHandler;
 
     public class ServiceRetriever extends Binder {
 
@@ -36,17 +36,18 @@ public class NetworkService extends Service implements Handler.Callback {
         super.onCreate();
 
         final HandlerThread thr = new HandlerThread("ConnectionService");
-        mHandler = new Handler(thr.getLooper(), this);
+        thr.start();
+        mNetworkHandler = new Handler(thr.getLooper(), this);
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
-        mHandler.getLooper().quit();
+        mNetworkHandler.getLooper().quit();
     }
 
     public void retrievePage(URL url, Handler callback) {
-        mHandler.sendMessage(mHandler.obtainMessage(Opcodes.GET_URL, Pair.create(url, callback)));
+        mNetworkHandler.sendMessage(mNetworkHandler.obtainMessage(Opcodes.GET_URL, Pair.create(url, callback)));
     }
 
     @Override
@@ -58,7 +59,7 @@ public class NetworkService extends Service implements Handler.Callback {
                 try {
                     args.second.sendMessage(args.second.obtainMessage(Opcodes.GET_URL, Jsoup.parse(args.first, 10000)));
                 } catch (IOException e) {
-                    args.second.sendMessage(args.second.obtainMessage(Opcodes.NETWORK_ERROR, R.string.network_error));
+                    args.second.sendMessage(args.second.obtainMessage(Opcodes.NETWORK_ERROR, R.string.network_error, 0, null));
                 }
                 break;
             default:

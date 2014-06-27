@@ -15,7 +15,7 @@ public class MainFlowActivity extends Activity {
     private NetworkService mService;
     private final Object mServiceWaiter = new Object();
 
-    private final Intent mServiceCaller = new Intent(this, NetworkService.class);
+    private Intent mServiceCaller;
     private final ServiceConnection mServiceConn = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
@@ -33,6 +33,8 @@ public class MainFlowActivity extends Activity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        mServiceCaller = new Intent(this, NetworkService.class);
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main_flow);
 
@@ -44,13 +46,13 @@ public class MainFlowActivity extends Activity {
     @Override
     protected void onStart() {
         super.onStart();
+        bindService(mServiceCaller, mServiceConn, BIND_AUTO_CREATE);
     }
 
     @Override
     protected void onStop() {
         super.onStop();
-        if(mService != null)
-            unbindService(mServiceConn);
+        unbindService(mServiceConn);
     }
 
     @Override
@@ -77,18 +79,6 @@ public class MainFlowActivity extends Activity {
      * @return service bound to this activity
      */
     public NetworkService getService() {
-        if(mService == null)
-            bindService(mServiceCaller, mServiceConn, BIND_AUTO_CREATE);
-
-        while(mService == null) {
-            synchronized (mServiceWaiter) {
-                try {
-                    mServiceWaiter.wait();
-                } catch (InterruptedException ignored) {
-                }
-            }
-        }
-
         return mService;
     }
 }
