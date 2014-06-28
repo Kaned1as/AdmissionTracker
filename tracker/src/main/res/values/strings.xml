@@ -8,4 +8,16 @@
     <string name="wait_please">Пожалуйста, подождите…</string>
     <string name="retrieving_data">Загрузка данных…</string>
     <string name="select_from_list">Выберите из списка</string>
+    <string name="name">Имя</string>
+    <string name="number">Номер в списке</string>
+    <string name="originals">Оригиналов документов</string>
+    <string name="docs_date">Дата подачи</string>
+    <string name="points_got">Баллы</string>
+    <string name="copies">Копий документов</string>
+    <string name="reclaimed">Забравших документы</string>
+    <string name="above_me">Выше меня по списку:</string>
+    <string name="statistics">Статистика:</string>
+    <string name="all_given">Всего подано документов</string>
+    <string name="today_reclaimed">Забрали сегодня</string>
+    <string name="needed_points">Нужно минимум баллов</string>
 </resources>
