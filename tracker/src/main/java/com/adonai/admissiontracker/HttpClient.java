@@ -15,7 +15,9 @@ import java.net.URL;
 public class HttpClient {
     private final String USER_AGENT_STRING = "Mozilla/5.0 (X11; Linux x86_64; rv:29.0) Gecko/20100101 Firefox/29.0";
     private final CookieManager manager;
+
     private URL currentURL = null;
+    private long lastModified = 0;
 
     public HttpClient() {
         manager = new CookieManager();
@@ -38,36 +40,6 @@ public class HttpClient {
             setDefaultParameters(httpGet);
 
             return getResponseString(httpGet);
-        } catch (Exception ignored) {
-        } // stream close / timeout
-        finally {
-            if (httpGet != null)
-                httpGet.disconnect();
-        }
-
-        return null;
-    }
-
-    public byte[] getPageAsByteArray(String url) {
-        if (url.startsWith("file"))
-            return null; // Не загружать локальные
-
-        HttpURLConnection httpGet = null;
-        try {
-            final URL address = new URL(currentURL, url);
-            httpGet = (HttpURLConnection) address.openConnection();
-            setDefaultParameters(httpGet);
-            // getting bytes of image
-            final InputStream is = httpGet.getInputStream();
-            final byte[] buffer = new byte[8192];
-            int bytesRead;
-            final ByteArrayOutputStream output = new ByteArrayOutputStream();
-            while ((bytesRead = is.read(buffer)) != -1)
-                output.write(buffer, 0, bytesRead);
-            is.close();
-            httpGet.disconnect();
-
-            return output.toByteArray();
         } catch (Exception ignored) {
         } // stream close / timeout
         finally {
@@ -107,6 +79,10 @@ public class HttpClient {
             }
         }
 
+        long lastMod = httpGet.getLastModified();
+        if(lastMod > 0)
+            lastModified = lastMod;
+
         return new String(getResponseBytes(httpGet), charset);
     }
 
@@ -123,28 +99,17 @@ public class HttpClient {
         return stream.toByteArray();
     }
 
-    /**
-     * Manual page processing
-     * Remember to disconnect connection!
-     *
-     * @param url url to fetch
-     * @return connection for manual usage
-     */
-    public HttpURLConnection getPageAndContext(String url) {
-        try {
-            currentURL = new URL(currentURL, url); // убиваем символ Non-breaking space
-            final HttpURLConnection httpGet = (HttpURLConnection) currentURL.openConnection();
-            setDefaultParameters(httpGet);
-            return httpGet;
-        } catch (Exception ignored) {
-        }
-
-        return null;
-    }
-
     private void setDefaultParameters(HttpURLConnection conn) {
         conn.setRequestProperty(HTTP.USER_AGENT, USER_AGENT_STRING);
         conn.setConnectTimeout(5000);
         conn.setReadTimeout(5000);
+    }
+
+    public String getCurrentURL() {
+        return currentURL.toString();
+    }
+
+    public long getLastModified() {
+        return lastModified;
     }
 }

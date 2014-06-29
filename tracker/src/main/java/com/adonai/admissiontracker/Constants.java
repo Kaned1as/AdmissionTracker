@@ -7,6 +7,7 @@ public class Constants {
 
     // Opcodes
     public final static int GET_URL = 0;
+    public final static int RELOAD_PAGE = 1;
     public final static int NETWORK_ERROR = -1;
 
     // URLs

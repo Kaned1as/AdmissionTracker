@@ -7,4 +7,5 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:ellipsize="marquee"
-    android:padding="7dp"/>
+    android:padding="7dp"
+    android:textColor="@android:color/white" />

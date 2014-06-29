@@ -59,7 +59,8 @@ public class SelectorFragment extends BaseFragment {
     public boolean handleMessage(Message msg) {
         switch (msg.what) {
             case Constants.GET_URL: // got our URL back
-                updateLayouts((Document) msg.obj);
+                final NetworkService.NetworkInfo ni = (NetworkService.NetworkInfo) msg.obj;
+                updateLayouts(ni.content);
                 break;
         }
 

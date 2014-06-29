@@ -5,6 +5,9 @@ import android.content.Context;
 import android.os.Bundle;
 import android.os.Message;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -18,7 +21,6 @@ import android.widget.ToggleButton;
 import com.adonai.admissiontracker.database.DatabaseFactory;
 import com.adonai.admissiontracker.entities.Favorite;
 
-import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
@@ -39,6 +41,8 @@ public class ShowSpbuDataFragment extends BaseFragment {
     private NameSelectorListener mNameSelectorListener = new NameSelectorListener();
     private FavoriteClickListener mFavClickListener = new FavoriteClickListener();
 
+    private long mLastModified = 0;
+
     public static ShowSpbuDataFragment forData(Favorite data) {
         final ShowSpbuDataFragment result = new ShowSpbuDataFragment();
         result.mFavorite = data;
@@ -47,6 +51,7 @@ public class ShowSpbuDataFragment extends BaseFragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        setHasOptionsMenu(true);
         final View rootView = inflater.inflate(R.layout.show_data_fragment, container, false);
 
         mNameSelector = (Spinner) rootView.findViewById(R.id.name_spinner);
@@ -55,6 +60,23 @@ public class ShowSpbuDataFragment extends BaseFragment {
         mFavButton.setOnCheckedChangeListener(mFavClickListener);
 
         return rootView;
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        inflater.inflate(R.menu.data_fragment, menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.refresh:
+                mProgressDialog.show();
+                getMainActivity().getService().reloadPage(mHandler);
+                break;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     @Override
@@ -71,17 +93,20 @@ public class ShowSpbuDataFragment extends BaseFragment {
     public boolean handleMessage(Message msg) {
         switch (msg.what) {
             case Constants.GET_URL: // got our URL back
-                final Document page = (Document) msg.obj;
-                final Element tableBody = page.select("tbody").first();
+                final NetworkService.NetworkInfo ni = (NetworkService.NetworkInfo) msg.obj;
+
+                final Element tableBody = ni.content.select("tbody").first();
                 if (tableBody == null) {
                     Toast.makeText(getActivity(), R.string.no_data_available, Toast.LENGTH_SHORT).show();
                     returnToSelections();
-                } else {
+                } else if(mLastModified < ni.lastModified) {
+                    mLastModified = Math.max(mLastModified, ni.lastModified);
+
                     updateNames(tableBody);
                     if(mFavorite.getNumber() != null) // it's favorite from DB
                         mNameSelector.setSelection(mFavorite.getNumber(), true);
-                }
-
+                } else
+                    Toast.makeText(getActivity(), R.string.no_updates_available, Toast.LENGTH_SHORT).show();
                 break;
         }
 

@@ -27,4 +27,6 @@
     <string name="removed_from_favs">Удалено из избранного</string>
     <string name="select_from_favs">Из избранного</string>
     <string name="last_updated">Последняя версия</string>
+    <string name="refresh">Обновить</string>
+    <string name="no_updates_available">Нет обновлений таблицы</string>
 </resources>

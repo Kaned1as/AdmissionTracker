@@ -51,6 +51,10 @@ public class NetworkService extends Service implements Handler.Callback {
         mNetworkHandler.sendMessage(mNetworkHandler.obtainMessage(Constants.GET_URL, Pair.create(url, callback)));
     }
 
+    public void reloadPage(Handler callback) {
+        mNetworkHandler.sendMessage(mNetworkHandler.obtainMessage(Constants.RELOAD_PAGE, callback));
+    }
+
     @Override
     @SuppressWarnings("unchecked")
     public boolean handleMessage(Message msg) {
@@ -60,16 +64,37 @@ public class NetworkService extends Service implements Handler.Callback {
                 try {
                     final String pageData = mClient.getPageAndContextAsString(args.first);
                     final Document result = Jsoup.parse(pageData);
-                    args.second.sendMessage(args.second.obtainMessage(Constants.GET_URL, result));
+                    args.second.sendMessage(args.second.obtainMessage(Constants.GET_URL, new NetworkInfo(result, mClient.getCurrentURL(), mClient.getLastModified())));
                 } catch (IOException e) {
                     args.second.sendMessage(args.second.obtainMessage(Constants.NETWORK_ERROR, R.string.network_error, 0, null));
                 }
                 break;
-
+            case Constants.RELOAD_PAGE:
+                final Handler callback = (Handler) msg.obj;
+                try {
+                    final String pageData = mClient.getPageAndContextAsString(mClient.getCurrentURL());
+                    final Document result = Jsoup.parse(pageData);
+                    callback.sendMessage(callback.obtainMessage(Constants.GET_URL, new NetworkInfo(result, mClient.getCurrentURL(), mClient.getLastModified())));
+                } catch (IOException e) {
+                    callback.sendMessage(callback.obtainMessage(Constants.NETWORK_ERROR, R.string.network_error, 0, null));
+                }
+                break;
             default:
                 break;
         }
 
         return true; // we should handle all
+    }
+
+    public static class NetworkInfo {
+        public Document content;
+        public String fullURL;
+        public long lastModified;
+
+        public NetworkInfo(Document content, String fullURL, long lastModified) {
+            this.content = content;
+            this.fullURL = fullURL;
+            this.lastModified = lastModified;
+        }
     }
 }
