@@ -2,7 +2,10 @@
 <resources>
     <color name="red">#88ff0000</color>
     <color name="yellow">#88ffff00</color>
+
     <color name="header_color">#880055aa</color>
+    <color name="name_selector_color">#8811cc99</color>
+
     <color name="double_view_header_color">#8833ccaa</color>
     <color name="double_view_body_color">#44888888</color>
 </resources>

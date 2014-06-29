@@ -13,11 +13,11 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 
 import java.io.IOException;
-import java.net.URL;
 
 public class NetworkService extends Service implements Handler.Callback {
 
     private Handler mNetworkHandler;
+    private HttpClient mClient = new HttpClient();
 
     public class ServiceRetriever extends Binder {
 
@@ -47,23 +47,25 @@ public class NetworkService extends Service implements Handler.Callback {
         mNetworkHandler.getLooper().quit();
     }
 
-    public void retrievePage(URL url, Handler callback) {
-        mNetworkHandler.sendMessage(mNetworkHandler.obtainMessage(Opcodes.GET_URL, Pair.create(url, callback)));
+    public void retrievePage(String url, Handler callback) {
+        mNetworkHandler.sendMessage(mNetworkHandler.obtainMessage(Constants.GET_URL, Pair.create(url, callback)));
     }
 
     @Override
     @SuppressWarnings("unchecked")
     public boolean handleMessage(Message msg) {
         switch (msg.what) {
-            case Opcodes.GET_URL:
-                Pair<URL, Handler> args = (Pair<URL, Handler>) msg.obj;
+            case Constants.GET_URL:
+                final Pair<String, Handler> args = (Pair<String, Handler>) msg.obj;
                 try {
-                    final Document result = Jsoup.parse(args.first.openStream(), "windows-1251", args.first.toString());
-                    args.second.sendMessage(args.second.obtainMessage(Opcodes.GET_URL, result));
+                    final String pageData = mClient.getPageAndContextAsString(args.first);
+                    final Document result = Jsoup.parse(pageData);
+                    args.second.sendMessage(args.second.obtainMessage(Constants.GET_URL, result));
                 } catch (IOException e) {
-                    args.second.sendMessage(args.second.obtainMessage(Opcodes.NETWORK_ERROR, R.string.network_error, 0, null));
+                    args.second.sendMessage(args.second.obtainMessage(Constants.NETWORK_ERROR, R.string.network_error, 0, null));
                 }
                 break;
+
             default:
                 break;
         }

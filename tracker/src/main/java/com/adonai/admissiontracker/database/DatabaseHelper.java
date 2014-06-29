@@ -27,7 +27,7 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
     private static final int DATABASE_VERSION = 1;
 
     //ссылки на DAO соответсвующие сущностям, хранимым в БД
-    private Dao<Favorite, Integer> favDao = null;
+    private Dao<Favorite, String> favDao = null;
     private Dao<Statistics, Integer> statDao = null;
 
     public DatabaseHelper(Context context){
@@ -55,7 +55,7 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
     }
 
     //синглтон для GoalDAO
-    public Dao<Favorite, Integer> getFavoritesDao() throws SQLException {
+    public Dao<Favorite, String> getFavoritesDao() throws SQLException {
         if(favDao == null)
             favDao = getDao(Favorite.class);
 

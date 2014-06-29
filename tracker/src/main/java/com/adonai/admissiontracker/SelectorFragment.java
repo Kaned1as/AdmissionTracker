@@ -1,7 +1,6 @@
 package com.adonai.admissiontracker;
 
 import android.app.FragmentTransaction;
-import android.content.Context;
 import android.os.Bundle;
 import android.os.Message;
 import android.view.LayoutInflater;
@@ -12,16 +11,12 @@ import android.widget.ArrayAdapter;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.adonai.admissiontracker.database.DatabaseFactory;
 import com.adonai.admissiontracker.entities.Favorite;
 
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
-
-import java.sql.SQLException;
 
 /**
  * A placeholder fragment containing a simple view.
@@ -51,13 +46,8 @@ public class SelectorFragment extends BaseFragment {
     @Override
     public boolean handleMessage(Message msg) {
         switch (msg.what) {
-            case Opcodes.GET_URL: // got our URL back
+            case Constants.GET_URL: // got our URL back
                 updateLayouts((Document) msg.obj);
-                break;
-            case Opcodes.NETWORK_ERROR:
-                Toast.makeText(getActivity(), msg.arg1, Toast.LENGTH_SHORT).show();
-                break;
-            default:
                 break;
         }
 
@@ -90,13 +80,6 @@ public class SelectorFragment extends BaseFragment {
                     @Override
                     public void onClick(View v) {
                         final Favorite holder = new Favorite(div.text(), url);
-                        try {
-                            DatabaseFactory.getHelper().getFavoritesDao().createOrUpdate(holder);
-                            Toast.makeText(getActivity(), R.string.added_to_favs, Toast.LENGTH_SHORT).show();
-                        } catch (SQLException e) {
-                            Toast.makeText(getActivity(), R.string.database_error, Toast.LENGTH_SHORT).show();
-                        }
-
                         getFragmentManager()
                             .beginTransaction()
                                 .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
@@ -110,7 +93,7 @@ public class SelectorFragment extends BaseFragment {
         }
 
         final Spinner levelSelector = new Spinner(getActivity());
-        final ElementAdapter elementAdapter = new ElementAdapter(getActivity(), childListItems);
+        final WithZeroAdapter elementAdapter = new WithZeroAdapter(getActivity(), childListItems);
         levelSelector.setAdapter(elementAdapter);
         levelSelector.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
@@ -130,52 +113,6 @@ public class SelectorFragment extends BaseFragment {
         mSpinnersHolder.addView(levelSelector);
     }
 
-    public static class ElementAdapter extends ArrayAdapter<Element> {
-
-        public ElementAdapter(Context context, Elements objects) {
-            super(context, R.layout.tall_list_item, objects);
-        }
-
-        @Override
-        public Element getItem(int position) {
-            if(position == 0)
-                return null;
-            else
-                return super.getItem(position - 1);
-        }
-
-        @Override
-        public int getCount() {
-            return super.getCount() + 1;
-        }
-
-        @Override
-        public View getView(int position, View convertView, ViewGroup parent) {
-            return newView(position, convertView, parent);
-        }
-
-        @Override
-        public View getDropDownView(int position, View convertView, ViewGroup parent) {
-            return newView(position, convertView, parent);
-        }
-
-        public View newView(int position, View convertView, ViewGroup parent) {
-            final View view;
-            final TextView text;
-            final Element item = getItem(position);
-
-            if (convertView == null)
-                view = LayoutInflater.from(getContext()).inflate(R.layout.tall_list_item, parent, false);
-            else
-                view = convertView;
-
-            text = (TextView) view.findViewById(android.R.id.text1);
-            text.setText(item == null ? getContext().getString(R.string.select_from_list) : item.child(0).text().substring(1));
-
-            return view;
-        }
-    }
-
     private class InstitutionSelectorListener implements AdapterView.OnItemSelectedListener {
 
         @Override
@@ -187,7 +124,7 @@ public class SelectorFragment extends BaseFragment {
                     break;
                 case 1: // spbu
                     mProgressDialog.show();
-                    getMainActivity().getService().retrievePage(PageAddresses.SPBU, mHandler);
+                    getMainActivity().getService().retrievePage(Constants.SPBU, mHandler);
                     break;
                 default:
                     break;

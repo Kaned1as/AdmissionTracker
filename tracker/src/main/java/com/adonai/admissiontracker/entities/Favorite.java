@@ -14,13 +14,13 @@ import java.util.Date;
 @DatabaseTable(tableName = "favorites")
 public class Favorite {
 
-    @DatabaseField(id = true)
+    @DatabaseField(id = true, useGetSet = true)
     private String title;
 
     @DatabaseField(canBeNull = false)
     private String url;
 
-    @DatabaseField
+    @DatabaseField(canBeNull = false)
     private String name;
 
     @DatabaseField(dataType = DataType.DATE_LONG)
@@ -38,8 +38,31 @@ public class Favorite {
         this.url = url;
     }
 
-    @Override
-    public String toString() {
-        return title;
+    public String getTitle() {
+        return title + " - " + name;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public String getUrl() {
+        return url;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public Date getLastUpdated() {
+        return lastUpdated;
+    }
+
+    public void setLastUpdated(Date lastUpdated) {
+        this.lastUpdated = lastUpdated;
     }
 }

@@ -2,10 +2,19 @@ package com.adonai.admissiontracker;
 
 import android.app.Fragment;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.HandlerThread;
 import android.os.Message;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 
 /**
  * Created by adonai on 27.06.14.
@@ -37,7 +46,59 @@ public abstract class BaseFragment extends Fragment implements Handler.Callback 
         if(mProgressDialog.isShowing())
             mProgressDialog.hide();
 
+        switch (msg.what) {
+            case Constants.NETWORK_ERROR:
+                Toast.makeText(getActivity(), msg.arg1, Toast.LENGTH_SHORT).show();
+                break;
+        }
+
         return true;
+    }
+
+    public static class WithZeroAdapter extends ArrayAdapter<Element> {
+
+        public WithZeroAdapter(Context context, Elements objects) {
+            super(context, R.layout.tall_list_item, objects);
+        }
+
+        @Override
+        public Element getItem(int position) {
+            if(position == 0)
+                return null;
+            else
+                return super.getItem(position - 1);
+        }
+
+        @Override
+        public int getCount() {
+            return super.getCount() + 1;
+        }
+
+        @Override
+        public View getView(int position, View convertView, ViewGroup parent) {
+            return newView(position, convertView, parent);
+        }
+
+        @Override
+        public View getDropDownView(int position, View convertView, ViewGroup parent) {
+            return newView(position, convertView, parent);
+        }
+
+        public View newView(int position, View convertView, ViewGroup parent) {
+            final View view;
+            final TextView text;
+            final Element item = getItem(position);
+
+            if (convertView == null)
+                view = LayoutInflater.from(getContext()).inflate(R.layout.tall_list_item, parent, false);
+            else
+                view = convertView;
+
+            text = (TextView) view.findViewById(android.R.id.text1);
+            text.setText(item == null ? getContext().getString(R.string.select_from_list) : item.child(0).text().substring(1));
+
+            return view;
+        }
     }
 
     public MainFlowActivity getMainActivity() {

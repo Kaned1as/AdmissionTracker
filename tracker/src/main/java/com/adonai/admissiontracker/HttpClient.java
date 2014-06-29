@@ -10,12 +10,12 @@ import java.net.CookieManager;
 import java.net.CookiePolicy;
 import java.net.CookieStore;
 import java.net.HttpURLConnection;
-import java.net.URI;
+import java.net.URL;
 
 public class HttpClient {
     private final String USER_AGENT_STRING = "Mozilla/5.0 (X11; Linux x86_64; rv:29.0) Gecko/20100101 Firefox/29.0";
     private final CookieManager manager;
-    String currentURL = "";
+    private URL currentURL = null;
 
     public HttpClient() {
         manager = new CookieManager();
@@ -33,8 +33,8 @@ public class HttpClient {
 
         HttpURLConnection httpGet = null;
         try {
-            final URI address = new URI(currentURL).resolve(url);
-            httpGet = (HttpURLConnection) address.toURL().openConnection();
+            final URL address = new URL(currentURL, url);
+            httpGet = (HttpURLConnection) address.openConnection();
             setDefaultParameters(httpGet);
 
             return getResponseString(httpGet);
@@ -54,8 +54,8 @@ public class HttpClient {
 
         HttpURLConnection httpGet = null;
         try {
-            final URI address = new URI(currentURL).resolve(url);
-            httpGet = (HttpURLConnection) address.toURL().openConnection();
+            final URL address = new URL(currentURL, url);
+            httpGet = (HttpURLConnection) address.openConnection();
             setDefaultParameters(httpGet);
             // getting bytes of image
             final InputStream is = httpGet.getInputStream();
@@ -78,36 +78,32 @@ public class HttpClient {
         return null;
     }
 
-    public String getPageAndContextAsString(String url) {
+    public String getPageAndContextAsString(String url) throws IOException {
         HttpURLConnection httpGet = null;
         try {
-            final URI address = new URI(currentURL).resolve(url.trim().replace(" ", "")); // убиваем символ Non-breaking space
-            currentURL = address.toURL().toString();
-            httpGet = (HttpURLConnection) address.toURL().openConnection();
+            currentURL = new URL(currentURL, url);
+            httpGet = (HttpURLConnection) currentURL.openConnection();
             setDefaultParameters(httpGet);
 
             return getResponseString(httpGet);
-        } catch (Exception ignored) {
-        } // stream close / timeout
-        finally {
+        } finally {
             if (httpGet != null)
                 httpGet.disconnect();
         }
-
-        return null;
     }
 
     public String getResponseString(HttpURLConnection httpGet) throws IOException {
-        final String contentType = httpGet.getContentType();
-        final String[] values = contentType.split(";");
         String charset = "windows-1251";
+        final String contentType = httpGet.getContentType();
+        if(contentType != null) {
+            final String[] values = contentType.split(";");
+            for (String value : values) {
+                value = value.trim();
 
-        for (String value : values) {
-            value = value.trim();
-
-            if (value.toLowerCase().startsWith("charset=")) {
-                charset = value.substring("charset=".length());
-                break;
+                if (value.toLowerCase().startsWith("charset=")) {
+                    charset = value.substring("charset=".length());
+                    break;
+                }
             }
         }
 
@@ -136,9 +132,8 @@ public class HttpClient {
      */
     public HttpURLConnection getPageAndContext(String url) {
         try {
-            final URI address = new URI(currentURL).resolve(url.trim().replace(" ", "")); // убиваем символ Non-breaking space
-            currentURL = address.toURL().toString();
-            final HttpURLConnection httpGet = (HttpURLConnection) address.toURL().openConnection();
+            currentURL = new URL(currentURL, url); // убиваем символ Non-breaking space
+            final HttpURLConnection httpGet = (HttpURLConnection) currentURL.openConnection();
             setDefaultParameters(httpGet);
             return httpGet;
         } catch (Exception ignored) {
