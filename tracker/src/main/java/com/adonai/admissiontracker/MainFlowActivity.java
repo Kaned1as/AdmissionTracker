@@ -11,6 +11,8 @@ import android.preference.PreferenceManager;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.adonai.admissiontracker.database.DatabaseFactory;
+
 
 public class MainFlowActivity extends Activity {
 
@@ -36,6 +38,7 @@ public class MainFlowActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         mServiceCaller = new Intent(this, NetworkService.class);
+        DatabaseFactory.setHelper(this);
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main_flow);
@@ -43,6 +46,12 @@ public class MainFlowActivity extends Activity {
         if (savedInstanceState == null) {
             getFragmentManager().beginTransaction().add(R.id.container, new SelectorFragment()).commit();
         }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        DatabaseFactory.releaseHelper();
     }
 
     @Override

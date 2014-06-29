@@ -22,5 +22,6 @@ android {
 dependencies {
     compile 'org.jsoup:jsoup:+'
     compile 'com.google.code.gson:gson:+'
+    compile 'com.j256.ormlite:ormlite-android:+'
     compile fileTree(dir: 'libs', include: ['*.jar'])
 }

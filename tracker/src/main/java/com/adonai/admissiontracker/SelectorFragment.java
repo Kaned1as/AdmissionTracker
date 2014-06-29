@@ -14,7 +14,7 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.adonai.admissiontracker.entities.FavoriteHolder;
+import com.adonai.admissiontracker.entities.Favorite;
 
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -86,8 +86,8 @@ public class SelectorFragment extends BaseFragment {
                 link.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        final FavoriteHolder holder = new FavoriteHolder(div.text(), url);
-                        FavoriteHolder.addFavorite(getMainActivity().getPreferences(), holder);
+                        final Favorite holder = new Favorite(div.text(), url);
+                        Favorite.addFavorite(getMainActivity().getPreferences(), holder);
 
                         getFragmentManager()
                             .beginTransaction()
