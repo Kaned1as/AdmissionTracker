@@ -14,11 +14,14 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.adonai.admissiontracker.database.DatabaseFactory;
 import com.adonai.admissiontracker.entities.Favorite;
 
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+
+import java.sql.SQLException;
 
 /**
  * A placeholder fragment containing a simple view.
@@ -34,7 +37,7 @@ public class SelectorFragment extends BaseFragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.institution_selector_fragment, container, false);
+        final View rootView = inflater.inflate(R.layout.institution_selector_fragment, container, false);
 
         mInstSelector = (Spinner) rootView.findViewById(R.id.institution_spinner);
         mInstSelector.setAdapter(new ArrayAdapter<String>(getActivity(), R.layout.tall_list_item, getResources().getStringArray(R.array.institutions_array)));
@@ -87,12 +90,17 @@ public class SelectorFragment extends BaseFragment {
                     @Override
                     public void onClick(View v) {
                         final Favorite holder = new Favorite(div.text(), url);
-                        Favorite.addFavorite(getMainActivity().getPreferences(), holder);
+                        try {
+                            DatabaseFactory.getHelper().getFavoritesDao().createOrUpdate(holder);
+                            Toast.makeText(getActivity(), R.string.added_to_favs, Toast.LENGTH_SHORT).show();
+                        } catch (SQLException e) {
+                            Toast.makeText(getActivity(), R.string.database_error, Toast.LENGTH_SHORT).show();
+                        }
 
                         getFragmentManager()
                             .beginTransaction()
                                 .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
-                                .replace(R.id.container, new SelectorFragment())
+                                .replace(R.id.container, ShowDataFragment.forData(holder))
                             .commit();
                     }
                 });

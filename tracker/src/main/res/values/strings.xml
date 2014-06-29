@@ -20,4 +20,6 @@
     <string name="all_given">Всего подано документов</string>
     <string name="today_reclaimed">Забрали сегодня</string>
     <string name="needed_points">Нужно минимум баллов</string>
+    <string name="added_to_favs">Добавлено в избранное!</string>
+    <string name="database_error">Ошибка базы данных</string>
 </resources>

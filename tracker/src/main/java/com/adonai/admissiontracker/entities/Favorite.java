@@ -5,8 +5,8 @@ import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.field.ForeignCollectionField;
 import com.j256.ormlite.table.DatabaseTable;
 
+import java.util.Collection;
 import java.util.Date;
-import java.util.List;
 
 /**
  * Created by adonai on 27.06.14.
@@ -14,14 +14,10 @@ import java.util.List;
 @DatabaseTable(tableName = "favorites")
 public class Favorite {
 
-
-    @DatabaseField(generatedId = true)
-    private Integer id;
-
-    @DatabaseField
+    @DatabaseField(id = true)
     private String title;
 
-    @DatabaseField
+    @DatabaseField(canBeNull = false)
     private String url;
 
     @DatabaseField
@@ -31,7 +27,7 @@ public class Favorite {
     private Date lastUpdated;
 
     @ForeignCollectionField
-    private List<Statistics> statList;
+    private Collection<Statistics> statList;
 
     public Favorite() {
 
