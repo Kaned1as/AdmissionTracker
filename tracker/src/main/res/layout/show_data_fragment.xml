@@ -30,7 +30,7 @@
             android:layout_gravity="center"
             android:visibility="visible"
             android:textOff=""
-            android:textOn="0" />
+            android:textOn="" />
 
     </LinearLayout>
 
@@ -134,7 +134,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:id="@+id/all_given"
-                app:header_text="@string/all_given"
+                app:header_text="@string/last_updated"
                 android:layout_margin="5dp" />
 
             <view class="com.adonai.admissiontracker.views.DoubleTextView"

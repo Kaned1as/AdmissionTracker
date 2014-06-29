@@ -10,5 +10,5 @@ public class Constants {
     public final static int NETWORK_ERROR = -1;
 
     // URLs
-    public final static String SPBU = "https://cabinet.spbu.ru/Lists/1k_EntryLists/";
+    public final static String SPBU = "https://cabinet.spbu.ru/Lists/1k_EntryLists/";       // index = 1
 }

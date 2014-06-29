@@ -28,7 +28,7 @@ import java.util.Arrays;
 /**
  * Created by adonai on 27.06.14.
  */
-public class ShowDataFragment extends BaseFragment {
+public class ShowSpbuDataFragment extends BaseFragment {
 
     private Favorite mFavorite;
     private Elements mStudents = null;
@@ -39,8 +39,8 @@ public class ShowDataFragment extends BaseFragment {
     private NameSelectorListener mNameSelectorListener = new NameSelectorListener();
     private FavoriteClickListener mFavClickListener = new FavoriteClickListener();
 
-    public static ShowDataFragment forData(Favorite data) {
-        final ShowDataFragment result = new ShowDataFragment();
+    public static ShowSpbuDataFragment forData(Favorite data) {
+        final ShowSpbuDataFragment result = new ShowSpbuDataFragment();
         result.mFavorite = data;
         return result;
     }
@@ -76,8 +76,11 @@ public class ShowDataFragment extends BaseFragment {
                 if (tableBody == null) {
                     Toast.makeText(getActivity(), R.string.no_data_available, Toast.LENGTH_SHORT).show();
                     returnToSelections();
-                } else
+                } else {
                     updateNames(tableBody);
+                    if(mFavorite.getNumber() != null) // it's favorite from DB
+                        mNameSelector.setSelection(mFavorite.getNumber(), true);
+                }
 
                 break;
         }
@@ -103,7 +106,7 @@ public class ShowDataFragment extends BaseFragment {
             .commit();
     }
 
-    private static class NamesAdapter extends WithZeroAdapter {
+    private static class NamesAdapter extends WithZeroAdapter<Element> {
 
         public NamesAdapter(Context context, Elements objects) {
             super(context, objects);
@@ -142,6 +145,7 @@ public class ShowDataFragment extends BaseFragment {
             if(row != null) {
                 final TextView text = (TextView) view.findViewById(android.R.id.text1);
                 mFavorite.setName(text.getText().toString());
+                mFavorite.setNumber(position);
                 try {
                     final Favorite inDb = DatabaseFactory.getHelper().getFavoritesDao().queryForSameId(mFavorite);
                     mFavButton.setOnCheckedChangeListener(null);

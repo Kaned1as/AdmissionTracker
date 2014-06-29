@@ -25,4 +25,6 @@
     <string name="select_name">Выберите имя</string>
     <string name="no_data_available">Никто не подал заявлений</string>
     <string name="removed_from_favs">Удалено из избранного</string>
+    <string name="select_from_favs">Из избранного</string>
+    <string name="last_updated">Последняя версия</string>
 </resources>

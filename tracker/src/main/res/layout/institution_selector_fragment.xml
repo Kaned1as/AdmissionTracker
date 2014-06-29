@@ -9,10 +9,10 @@
         android:layout_height="wrap_content"
         android:id="@+id/institution_spinner"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="50dp"
         android:prompt="@string/select_institution"
         android:layout_marginLeft="20dp"
-        android:layout_marginRight="20dp" />
+        android:layout_marginRight="20dp"
+        android:layout_below="@+id/favorites_spinner" />
 
     <LinearLayout
         android:animateLayoutChanges="true"
@@ -23,5 +23,13 @@
         android:layout_centerHorizontal="true"
         android:layout_margin="40dp"
         android:id="@+id/spinners_container"/>
+
+    <Spinner
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/favorites_spinner"
+        android:layout_marginLeft="50dp"
+        android:layout_marginRight="50dp"
+        android:visibility="invisible" />
 
 </RelativeLayout>

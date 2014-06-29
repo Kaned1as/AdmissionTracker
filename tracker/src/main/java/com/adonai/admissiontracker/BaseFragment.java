@@ -13,8 +13,7 @@ import android.widget.ArrayAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import org.jsoup.nodes.Element;
-import org.jsoup.select.Elements;
+import java.util.List;
 
 /**
  * Created by adonai on 27.06.14.
@@ -39,6 +38,7 @@ public abstract class BaseFragment extends Fragment implements Handler.Callback 
     @Override
     public void onDestroy() {
         super.onDestroy();
+        mProgressDialog.dismiss();
     }
 
     @Override
@@ -55,14 +55,14 @@ public abstract class BaseFragment extends Fragment implements Handler.Callback 
         return true;
     }
 
-    public static class WithZeroAdapter extends ArrayAdapter<Element> {
+    public static class WithZeroAdapter<T> extends ArrayAdapter<T> {
 
-        public WithZeroAdapter(Context context, Elements objects) {
+        public WithZeroAdapter(Context context, List<T> objects) {
             super(context, R.layout.tall_list_item, objects);
         }
 
         @Override
-        public Element getItem(int position) {
+        public T getItem(int position) {
             if(position == 0)
                 return null;
             else
@@ -87,7 +87,7 @@ public abstract class BaseFragment extends Fragment implements Handler.Callback 
         public View newView(int position, View convertView, ViewGroup parent) {
             final View view;
             final TextView text;
-            final Element item = getItem(position);
+            final T item = getItem(position);
 
             if (convertView == null)
                 view = LayoutInflater.from(getContext()).inflate(R.layout.tall_list_item, parent, false);
@@ -95,7 +95,7 @@ public abstract class BaseFragment extends Fragment implements Handler.Callback 
                 view = convertView;
 
             text = (TextView) view.findViewById(android.R.id.text1);
-            text.setText(item == null ? getContext().getString(R.string.select_from_list) : item.child(0).text().substring(1));
+            text.setText(item == null ? getContext().getString(R.string.select_from_list) : item.toString());
 
             return view;
         }

@@ -9,7 +9,9 @@ import java.util.Collection;
 import java.util.Date;
 
 /**
- * Created by adonai on 27.06.14.
+ * Entity representing favorite holder
+ *
+ * @author Adonai
  */
 @DatabaseTable(tableName = "favorites")
 public class Favorite {
@@ -22,6 +24,12 @@ public class Favorite {
 
     @DatabaseField(canBeNull = false)
     private String name;
+
+    @DatabaseField(canBeNull = false)
+    private Integer number;
+
+    @DatabaseField(canBeNull = false)
+    private Integer parentInstitution;
 
     @DatabaseField(dataType = DataType.DATE_LONG)
     private Date lastUpdated;
@@ -39,11 +47,19 @@ public class Favorite {
     }
 
     public String getTitle() {
-        return title + " - " + name;
+        return title + " - " + name + " - " + number;
+    }
+
+    public String getTitleRaw() {
+        return title;
+    }
+
+    public void setTitleRaw(String title) {
+        this.title = title;
     }
 
     public void setTitle(String title) {
-        this.title = title;
+        this.title = title.split(" - ")[0];
     }
 
     public String getUrl() {
@@ -64,5 +80,21 @@ public class Favorite {
 
     public void setLastUpdated(Date lastUpdated) {
         this.lastUpdated = lastUpdated;
+    }
+
+    public Integer getParentInstitution() {
+        return parentInstitution;
+    }
+
+    public void setParentInstitution(Integer parentInstitution) {
+        this.parentInstitution = parentInstitution;
+    }
+
+    public Integer getNumber() {
+        return number;
+    }
+
+    public void setNumber(Integer number) {
+        this.number = number;
     }
 }
