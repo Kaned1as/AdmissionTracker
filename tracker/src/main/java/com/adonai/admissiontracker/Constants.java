@@ -11,5 +11,21 @@ public class Constants {
     public final static int NETWORK_ERROR = -1;
 
     // URLs
-    public final static String SPBU = "https://cabinet.spbu.ru/Lists/1k_EntryLists/";       // index = 1
+    public enum Universities {
+        NONE,
+        SPBU("https://cabinet.spbu.ru/Lists/1k_EntryLists/");
+
+        private String url;
+
+        Universities(String url) {
+            this.url = url;
+        }
+
+        Universities() {
+        }
+
+        public String getUrl() {
+            return url;
+        }
+    }
 }

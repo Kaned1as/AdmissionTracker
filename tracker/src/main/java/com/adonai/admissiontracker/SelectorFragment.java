@@ -24,6 +24,8 @@ import org.jsoup.select.Elements;
 import java.sql.SQLException;
 import java.util.List;
 
+import static com.adonai.admissiontracker.Constants.Universities.*;
+
 /**
  * A placeholder fragment containing a simple view.
  */
@@ -33,7 +35,7 @@ public class SelectorFragment extends BaseFragment {
     private Spinner mFavSelector;
     private LinearLayout mSpinnersHolder;
 
-    private int mSelectedInstitution = 0;
+    private Constants.Universities mSelectedInstitution = NONE;
 
     private AdapterView.OnItemSelectedListener mInstSelectListener = new InstitutionSelectorListener();
     private AdapterView.OnItemSelectedListener mFavSelectListener = new FavoriteSelectorListener();
@@ -68,9 +70,10 @@ public class SelectorFragment extends BaseFragment {
     }
 
     private void updateLayouts(Document doc) {
-        if(mSelectedInstitution == 0) // should never happen
+        if(mSelectedInstitution == NONE) // should never happen
             return;
 
+        // Показываем панель выбора из избранного
         try {
             final List<Favorite> favsForSelectedInst = DatabaseFactory.getHelper().getFavoritesDao().queryForEq("parentInstitution", mSelectedInstitution);
             if(!favsForSelectedInst.isEmpty()) {
@@ -82,8 +85,10 @@ public class SelectorFragment extends BaseFragment {
         } catch (SQLException e) {
             Toast.makeText(getActivity(), R.string.database_error, Toast.LENGTH_SHORT).show();
         }
+
+        // парсим документ
         switch (mSelectedInstitution) {
-            case 1: // spbu
+            case SPBU:
                 setLayoutSpbu(doc.select(".treeview > ul").first());
                 break;
             default:
@@ -103,13 +108,10 @@ public class SelectorFragment extends BaseFragment {
                 link.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        final Favorite holder = new Favorite(div.text(), url);
-                        holder.setParentInstitution(mInstSelector.getSelectedItemPosition());
-
                         getFragmentManager()
                             .beginTransaction()
                                 .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
-                                .replace(R.id.container, ShowSpbuDataFragment.forData(holder))
+                                .replace(R.id.container, ShowSpbuDataFragment.forPage(SPBU, div.text(), url))
                             .commit();
                     }
                 });
@@ -144,13 +146,13 @@ public class SelectorFragment extends BaseFragment {
         @Override
         public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
             mSpinnersHolder.removeAllViews();
-            mSelectedInstitution = position;
-            switch (position) {
-                case 0: // nothing selected
+            mSelectedInstitution = Constants.Universities.values()[position];
+            switch (mSelectedInstitution) {
+                case NONE: // nothing selected
                     break;
-                case 1: // spbu
+                case SPBU:
                     mProgressDialog.show();
-                    getMainActivity().getService().retrievePage(Constants.SPBU, mHandler);
+                    getMainActivity().getService().retrievePage(SPBU.getUrl(), mHandler);
                     break;
                 default:
                     break;
@@ -171,12 +173,12 @@ public class SelectorFragment extends BaseFragment {
                 return;
 
             switch (mSelectedInstitution) {
-                case 1: // SPBU
+                case SPBU: // SPBU
 
                     getFragmentManager()
                         .beginTransaction()
                             .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
-                            .replace(R.id.container, ShowSpbuDataFragment.forData(selectedFav))
+                            .replace(R.id.container, ShowSpbuDataFragment.forFavorite(selectedFav))
                         .commit();
                     break;
             }

@@ -11,6 +11,7 @@ import android.util.Pair;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
+import org.jsoup.select.Elements;
 
 import java.io.IOException;
 
@@ -47,14 +48,6 @@ public class NetworkService extends Service implements Handler.Callback {
         mNetworkHandler.getLooper().quit();
     }
 
-    public void retrievePage(String url, Handler callback) {
-        mNetworkHandler.sendMessage(mNetworkHandler.obtainMessage(Constants.GET_URL, Pair.create(url, callback)));
-    }
-
-    public void reloadPage(Handler callback) {
-        mNetworkHandler.sendMessage(mNetworkHandler.obtainMessage(Constants.RELOAD_PAGE, callback));
-    }
-
     @Override
     @SuppressWarnings("unchecked")
     public boolean handleMessage(Message msg) {
@@ -67,16 +60,6 @@ public class NetworkService extends Service implements Handler.Callback {
                     args.second.sendMessage(args.second.obtainMessage(Constants.GET_URL, new NetworkInfo(result, mClient.getCurrentURL(), mClient.getLastModified())));
                 } catch (IOException e) {
                     args.second.sendMessage(args.second.obtainMessage(Constants.NETWORK_ERROR, R.string.network_error, 0, null));
-                }
-                break;
-            case Constants.RELOAD_PAGE:
-                final Handler callback = (Handler) msg.obj;
-                try {
-                    final String pageData = mClient.getPageAndContextAsString(mClient.getCurrentURL());
-                    final Document result = Jsoup.parse(pageData);
-                    callback.sendMessage(callback.obtainMessage(Constants.GET_URL, new NetworkInfo(result, mClient.getCurrentURL(), mClient.getLastModified())));
-                } catch (IOException e) {
-                    callback.sendMessage(callback.obtainMessage(Constants.NETWORK_ERROR, R.string.network_error, 0, null));
                 }
                 break;
             default:
@@ -96,5 +79,13 @@ public class NetworkService extends Service implements Handler.Callback {
             this.fullURL = fullURL;
             this.lastModified = lastModified;
         }
+    }
+
+    public void retrieveStatistics(Elements table, int position, Handler mHandler) {
+
+    }
+
+    public void retrievePage(String url, Handler callback) {
+        mNetworkHandler.sendMessage(mNetworkHandler.obtainMessage(Constants.GET_URL, Pair.create(url, callback)));
     }
 }

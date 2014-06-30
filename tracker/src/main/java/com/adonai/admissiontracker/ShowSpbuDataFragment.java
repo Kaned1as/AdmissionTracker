@@ -26,13 +26,21 @@ import org.jsoup.select.Elements;
 
 import java.sql.SQLException;
 import java.util.Arrays;
+import java.util.Date;
 
 /**
  * Created by adonai on 27.06.14.
  */
 public class ShowSpbuDataFragment extends BaseFragment {
 
-    private Favorite mFavorite;
+    private static final String TITLE_KEY = "page.title";       // MANDATORY
+    private static final String URL_KEY = "page.url";           // MANDATORY
+    private static final String INST_KEY = "university.index";  // MANDATORY
+
+    private static final String NUM_KEY = "favorite.number";
+
+    private long mLastUpdated;
+
     private Elements mStudents = null;
 
     private Spinner mNameSelector;
@@ -41,11 +49,24 @@ public class ShowSpbuDataFragment extends BaseFragment {
     private NameSelectorListener mNameSelectorListener = new NameSelectorListener();
     private FavoriteClickListener mFavClickListener = new FavoriteClickListener();
 
-    private long mLastModified = 0;
-
-    public static ShowSpbuDataFragment forData(Favorite data) {
+    public static ShowSpbuDataFragment forFavorite(Favorite data) {
         final ShowSpbuDataFragment result = new ShowSpbuDataFragment();
-        result.mFavorite = data;
+        final Bundle args = new Bundle();
+        args.putString(TITLE_KEY, data.getTitleRaw());
+        args.putString(URL_KEY, data.getUrl());
+        args.putInt(INST_KEY, data.getParentInstitution());
+        args.putInt(NUM_KEY, data.getNumber());
+        result.setArguments(args);
+        return result;
+    }
+
+    public static ShowSpbuDataFragment forPage(Constants.Universities inst, String title, String url) {
+        final ShowSpbuDataFragment result = new ShowSpbuDataFragment();
+        final Bundle args = new Bundle();
+        args.putString(TITLE_KEY, title);
+        args.putString(URL_KEY, url);
+        args.putInt(INST_KEY, inst.ordinal());
+        result.setArguments(args);
         return result;
     }
 
@@ -73,7 +94,7 @@ public class ShowSpbuDataFragment extends BaseFragment {
         switch (item.getItemId()) {
             case R.id.refresh:
                 mProgressDialog.show();
-                getMainActivity().getService().reloadPage(mHandler);
+                getMainActivity().getService().retrievePage(getArguments().getString(URL_KEY), mHandler);
                 break;
         }
         return super.onOptionsItemSelected(item);
@@ -85,7 +106,7 @@ public class ShowSpbuDataFragment extends BaseFragment {
 
         if(mStudents == null) {
             mProgressDialog.show();
-            getMainActivity().getService().retrievePage(mFavorite.getUrl(), mHandler);
+            getMainActivity().getService().retrievePage(getArguments().getString(URL_KEY), mHandler);
         }
     }
 
@@ -99,12 +120,15 @@ public class ShowSpbuDataFragment extends BaseFragment {
                 if (tableBody == null) {
                     Toast.makeText(getActivity(), R.string.no_data_available, Toast.LENGTH_SHORT).show();
                     returnToSelections();
-                } else if(mLastModified < ni.lastModified) {
-                    mLastModified = Math.max(mLastModified, ni.lastModified);
+                } else if(mLastUpdated == 0 || mLastUpdated < ni.lastModified) {
+                    mStudents = tableBody.children();
+                    mLastUpdated = ni.lastModified;
 
-                    updateNames(tableBody);
-                    if(mFavorite.getNumber() != null) // it's favorite from DB
-                        mNameSelector.setSelection(mFavorite.getNumber(), true);
+                    updateNames();
+                    if(getArguments().containsKey(NUM_KEY)) { // it's favorite from DB
+                        mNameSelector.setSelection(getArguments().getInt(NUM_KEY), true);
+                        getArguments().remove(NUM_KEY);
+                    }
                 } else
                     Toast.makeText(getActivity(), R.string.no_updates_available, Toast.LENGTH_SHORT).show();
                 break;
@@ -113,8 +137,7 @@ public class ShowSpbuDataFragment extends BaseFragment {
         return super.handleMessage(msg);
     }
 
-    private void updateNames(Element tableBody) {
-        mStudents = tableBody.children();
+    private void updateNames() {
         final SpinnerAdapter nameAdapter = new NamesAdapter(getActivity(), mStudents);
         mNameSelector.setAdapter(nameAdapter);
     }
@@ -150,12 +173,7 @@ public class ShowSpbuDataFragment extends BaseFragment {
                 view = convertView;
 
             text = (TextView) view.findViewById(android.R.id.text1);
-            if(row == null)
-                text.setText(R.string.select_from_list);
-            else {
-                final Elements columns = row.children();
-                text.setText(Utils.join(Arrays.asList(columns.get(1).text(), columns.get(2).text(), columns.get(3).text()), " "));
-            }
+            text.setText(row == null ? getContext().getString(R.string.select_from_list) : extractNameForStudent(row));
 
             return view;
         }
@@ -168,11 +186,13 @@ public class ShowSpbuDataFragment extends BaseFragment {
             final Element row = (Element) parent.getAdapter().getItem(position);
             mFavButton.setVisibility(row != null ? View.VISIBLE : View.INVISIBLE);
             if(row != null) {
-                final TextView text = (TextView) view.findViewById(android.R.id.text1);
-                mFavorite.setName(text.getText().toString());
-                mFavorite.setNumber(position);
+                // update grid
+                getMainActivity().getService().retrieveStatistics(mStudents, mNameSelector.getSelectedItemPosition(), mHandler);
+
+                // update favorite button state
+                final Favorite toPersist = createFavForStudent(position);
                 try {
-                    final Favorite inDb = DatabaseFactory.getHelper().getFavoritesDao().queryForSameId(mFavorite);
+                    final Favorite inDb = DatabaseFactory.getHelper().getFavoritesDao().queryForSameId(toPersist);
                     mFavButton.setOnCheckedChangeListener(null);
                     if(inDb != null) // уже присутствует в БД, помечаем выделенным
                         mFavButton.setChecked(true);
@@ -198,18 +218,40 @@ public class ShowSpbuDataFragment extends BaseFragment {
         public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
             if(isChecked)
                 try {
-                    DatabaseFactory.getHelper().getFavoritesDao().createOrUpdate(mFavorite);
+                    DatabaseFactory.getHelper().getFavoritesDao().createOrUpdate(createFavForStudent(mNameSelector.getSelectedItemPosition()));
                     Toast.makeText(getActivity(), R.string.added_to_favs, Toast.LENGTH_SHORT).show();
                 } catch (SQLException e) {
                     Toast.makeText(getActivity(), R.string.database_error, Toast.LENGTH_SHORT).show();
                 }
             else
                 try {
-                    DatabaseFactory.getHelper().getFavoritesDao().delete(mFavorite);
+                    DatabaseFactory.getHelper().getFavoritesDao().delete(createFavForStudent(mNameSelector.getSelectedItemPosition()));
                     Toast.makeText(getActivity(), R.string.removed_from_favs, Toast.LENGTH_SHORT).show();
                 } catch (SQLException e) {
                     Toast.makeText(getActivity(), R.string.database_error, Toast.LENGTH_SHORT).show();
                 }
         }
+    }
+
+    /**
+     * Creates favorite to store in DB for selected index
+     * @param index index beginning from 1
+     * @return favorite instance for selected student
+     */
+    private Favorite createFavForStudent(int index) {
+        if(index <= 0 || index > mStudents.size())
+            throw new IllegalArgumentException("Unknown student index!");
+
+        final Favorite toCreate = new Favorite(getArguments().getString(TITLE_KEY), getArguments().getString(URL_KEY));
+        toCreate.setParentInstitution(getArguments().getInt(INST_KEY));
+        toCreate.setNumber(index);
+        toCreate.setName(extractNameForStudent(mStudents.get(index - 1)));
+
+        return toCreate;
+    }
+
+    private static String extractNameForStudent(Element row) {
+        final Elements columns = row.children();
+        return Utils.join(Arrays.asList(columns.get(1).text(), columns.get(2).text(), columns.get(3).text()), " ");
     }
 }
