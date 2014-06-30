@@ -29,4 +29,6 @@
     <string name="last_updated">Последняя версия</string>
     <string name="refresh">Обновить</string>
     <string name="no_updates_available">Нет обновлений таблицы</string>
+    <string name="wrong_date">Неверный формат даты</string>
+    <string name="wrong_page_format">Неверный формат страницы</string>
 </resources>

@@ -25,8 +25,8 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import java.sql.SQLException;
+import java.text.ParseException;
 import java.util.Arrays;
-import java.util.Date;
 
 /**
  * Created by adonai on 27.06.14.
@@ -187,10 +187,17 @@ public class ShowSpbuDataFragment extends BaseFragment {
             mFavButton.setVisibility(row != null ? View.VISIBLE : View.INVISIBLE);
             if(row != null) {
                 // update grid
-                getMainActivity().getService().retrieveStatistics(mStudents, mNameSelector.getSelectedItemPosition(), mHandler);
+                final Favorite toPersist = createFavForStudent(position);
+                try {
+                    NetworkService.StudentInfo stInfo = getMainActivity().getService().retrieveStatisticsSpbu(mStudents, toPersist, mHandler);
+
+                } catch (ParseException e) {
+                    Toast.makeText(getActivity(), R.string.wrong_date, Toast.LENGTH_SHORT).show();
+                } catch (NullPointerException e) {
+                    Toast.makeText(getActivity(), R.string.wrong_page_format, Toast.LENGTH_SHORT).show();
+                }
 
                 // update favorite button state
-                final Favorite toPersist = createFavForStudent(position);
                 try {
                     final Favorite inDb = DatabaseFactory.getHelper().getFavoritesDao().queryForSameId(toPersist);
                     mFavButton.setOnCheckedChangeListener(null);

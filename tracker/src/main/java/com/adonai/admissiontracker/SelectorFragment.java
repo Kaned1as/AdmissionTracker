@@ -24,7 +24,8 @@ import org.jsoup.select.Elements;
 import java.sql.SQLException;
 import java.util.List;
 
-import static com.adonai.admissiontracker.Constants.Universities.*;
+import static com.adonai.admissiontracker.Constants.Universities.NONE;
+import static com.adonai.admissiontracker.Constants.Universities.SPBU;
 
 /**
  * A placeholder fragment containing a simple view.
@@ -75,7 +76,7 @@ public class SelectorFragment extends BaseFragment {
 
         // Показываем панель выбора из избранного
         try {
-            final List<Favorite> favsForSelectedInst = DatabaseFactory.getHelper().getFavoritesDao().queryForEq("parentInstitution", mSelectedInstitution);
+            final List<Favorite> favsForSelectedInst = DatabaseFactory.getHelper().getFavoritesDao().queryForEq("parentInstitution", mSelectedInstitution.ordinal());
             if(!favsForSelectedInst.isEmpty()) {
                 mFavSelector.setVisibility(View.VISIBLE);
                 final FavoriteElementAdapter favAdapter = new FavoriteElementAdapter(getActivity(), favsForSelectedInst);

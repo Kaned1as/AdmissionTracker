@@ -12,13 +12,13 @@ import java.util.Date;
 @DatabaseTable(tableName = "statistics")
 public class Statistics {
 
-    @DatabaseField(generatedId = true)
+    @DatabaseField(generatedId = true, uniqueCombo = true)
     private Integer id;
 
     @DatabaseField(foreign = true, foreignAutoRefresh = true)
     private Favorite parent;
 
-    @DatabaseField(dataType = DataType.DATE_LONG)
+    @DatabaseField(dataType = DataType.DATE_LONG, uniqueCombo = true)
     private Date timestamp;
 
     @DatabaseField
@@ -35,4 +35,68 @@ public class Statistics {
 
     @DatabaseField
     private Integer neededPoints;
+
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
+    }
+
+    public Favorite getParent() {
+        return parent;
+    }
+
+    public void setParent(Favorite parent) {
+        this.parent = parent;
+    }
+
+    public Date getTimestamp() {
+        return timestamp;
+    }
+
+    public void setTimestamp(Date timestamp) {
+        this.timestamp = timestamp;
+    }
+
+    public Integer getOriginalsAbove() {
+        return originalsAbove;
+    }
+
+    public void setOriginalsAbove(Integer originalsAbove) {
+        this.originalsAbove = originalsAbove;
+    }
+
+    public Integer getReclaimedAbove() {
+        return reclaimedAbove;
+    }
+
+    public void setReclaimedAbove(Integer reclaimedAbove) {
+        this.reclaimedAbove = reclaimedAbove;
+    }
+
+    public Integer getTotalSubmitted() {
+        return totalSubmitted;
+    }
+
+    public void setTotalSubmitted(Integer totalSubmitted) {
+        this.totalSubmitted = totalSubmitted;
+    }
+
+    public Integer getReclaimedToday() {
+        return reclaimedToday;
+    }
+
+    public void setReclaimedToday(Integer reclaimedToday) {
+        this.reclaimedToday = reclaimedToday;
+    }
+
+    public Integer getNeededPoints() {
+        return neededPoints;
+    }
+
+    public void setNeededPoints(Integer neededPoints) {
+        this.neededPoints = neededPoints;
+    }
 }

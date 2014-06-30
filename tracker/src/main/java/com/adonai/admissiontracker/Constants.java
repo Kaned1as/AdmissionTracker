@@ -1,5 +1,7 @@
 package com.adonai.admissiontracker;
 
+import java.text.SimpleDateFormat;
+
 /**
  * Created by adonai on 29.06.14.
  */
@@ -13,12 +15,14 @@ public class Constants {
     // URLs
     public enum Universities {
         NONE,
-        SPBU("https://cabinet.spbu.ru/Lists/1k_EntryLists/");
+        SPBU("https://cabinet.spbu.ru/Lists/1k_EntryLists/", new SimpleDateFormat("dd.MM.YYYY"));
 
         private String url;
+        private SimpleDateFormat timeFormat;
 
-        Universities(String url) {
+        Universities(String url, SimpleDateFormat timeFormat) {
             this.url = url;
+            this.timeFormat = timeFormat;
         }
 
         Universities() {
@@ -26,6 +30,10 @@ public class Constants {
 
         public String getUrl() {
             return url;
+        }
+
+        public SimpleDateFormat getTimeFormat() {
+            return timeFormat;
         }
     }
 }

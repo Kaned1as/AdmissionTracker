@@ -9,11 +9,18 @@ import android.os.IBinder;
 import android.os.Message;
 import android.util.Pair;
 
+import com.adonai.admissiontracker.entities.Favorite;
+import com.adonai.admissiontracker.entities.Statistics;
+
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
 
 import java.io.IOException;
+import java.text.ParseException;
+import java.util.Date;
+
+import static com.adonai.admissiontracker.Constants.Universities.SPBU;
 
 public class NetworkService extends Service implements Handler.Callback {
 
@@ -81,8 +88,26 @@ public class NetworkService extends Service implements Handler.Callback {
         }
     }
 
-    public void retrieveStatistics(Elements table, int position, Handler mHandler) {
+    public static class StudentInfo {
+        public Statistics stats;
+        public Date admissionDate;
+    }
 
+    public StudentInfo retrieveStatisticsSpbu(Elements table, Favorite chosen, Handler mHandler) throws ParseException {
+        final Statistics currentStatistics = new Statistics();
+        currentStatistics.setParent(chosen);
+
+        final Elements myRow = table.get(chosen.getNumber() - 1).children();
+        final Date currentAdmissionDate = SPBU.getTimeFormat().parse(myRow.get(5).text());
+
+        currentStatistics.setTotalSubmitted(table.size());
+        currentStatistics.setTimestamp(chosen.getLastUpdated());
+
+        final StudentInfo result = new StudentInfo();
+        result.stats = currentStatistics;
+        result.admissionDate = currentAdmissionDate;
+
+        return result;
     }
 
     public void retrievePage(String url, Handler callback) {
