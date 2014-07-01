@@ -21,6 +21,8 @@ import android.widget.ToggleButton;
 import com.adonai.admissiontracker.database.DatabaseFactory;
 import com.adonai.admissiontracker.entities.Favorite;
 import com.adonai.admissiontracker.entities.Statistics;
+import com.adonai.admissiontracker.views.DoubleTextView;
+import com.j256.ormlite.stmt.QueryBuilder;
 
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
@@ -49,6 +51,8 @@ public class ShowSpbuDataFragment extends BaseFragment implements DataRetriever<
 
     private Spinner mNameSelector;
     private ToggleButton mFavButton;
+    private DoubleTextView mListNumber, mAdmissionDate, mPoints, mOriginalsAbove, mCopiesAbove, mReclaimedAbove;
+    private DoubleTextView mLastTimestamp, mTotalReclaimed, mNeededPoints;
 
     private NameSelectorListener mNameSelectorListener = new NameSelectorListener();
     private FavoriteClickListener mFavClickListener = new FavoriteClickListener();
@@ -83,6 +87,18 @@ public class ShowSpbuDataFragment extends BaseFragment implements DataRetriever<
         mNameSelector.setOnItemSelectedListener(mNameSelectorListener);
         mFavButton = (ToggleButton) rootView.findViewById(R.id.favorite_button);
         mFavButton.setOnCheckedChangeListener(mFavClickListener);
+
+        mListNumber = (DoubleTextView) rootView.findViewById(R.id.list_number);
+        mAdmissionDate = (DoubleTextView) rootView.findViewById(R.id.date);
+        mPoints = (DoubleTextView) rootView.findViewById(R.id.points);
+
+        mOriginalsAbove = (DoubleTextView) rootView.findViewById(R.id.originals);
+        mCopiesAbove = (DoubleTextView) rootView.findViewById(R.id.copies);
+        mReclaimedAbove = (DoubleTextView) rootView.findViewById(R.id.reclaimed_above);
+
+        mLastTimestamp = (DoubleTextView) rootView.findViewById(R.id.last_updated);
+        mTotalReclaimed = (DoubleTextView) rootView.findViewById(R.id.total_reclaimed);
+        mNeededPoints = (DoubleTextView) rootView.findViewById(R.id.needed_points);
 
         return rootView;
     }
@@ -146,8 +162,29 @@ public class ShowSpbuDataFragment extends BaseFragment implements DataRetriever<
         mNameSelector.setAdapter(nameAdapter);
     }
 
-    private void updateGrid() {
+    private void updateGrid(StudentInfo stInfo) {
+        mListNumber.setText(stInfo.stats.getParent().getNumber().toString());
+        mAdmissionDate.setText(SPBU.getTimeFormat().format(stInfo.admissionDate));
+        //mPoints.setText();
+        //mOriginalsAbove.setText();
+        //mCopiesAbove.setText();
+        //mReclaimedAbove.setText();
+        mLastTimestamp.setText(SPBU.getTimeFormat().format(stInfo.stats.getTimestamp()));
+        //mTotalReclaimed.setText();
+        //mNeededPoints.setText();
 
+        try {
+            // update stats in DB if it's needed
+            final Favorite inDb = DatabaseFactory.getHelper().getFavoritesDao().queryForSameId(stInfo.stats.getParent());
+            if(inDb != null) {
+                final QueryBuilder<Statistics, Integer> qb = DatabaseFactory.getHelper().getStatDao().queryBuilder();
+                qb.where().eq("parent", inDb).and().eq("timestamp", stInfo.stats.getTimestamp());
+                if (qb.queryForFirst() == null) // we haven't this field in DB
+                    DatabaseFactory.getHelper().getStatDao().create(stInfo.stats);
+            }
+        } catch (SQLException e) {
+            Toast.makeText(getActivity(), R.string.cannot_update_statistics, Toast.LENGTH_SHORT).show();
+        }
     }
 
     private void returnToSelections() {
@@ -216,9 +253,8 @@ public class ShowSpbuDataFragment extends BaseFragment implements DataRetriever<
                 // update grid
                 final Favorite toPersist = createFavForStudent(position);
                 try {
-                    StudentInfo stInfo = retrieveStatistics(toPersist, mStudents);
-
-
+                    final StudentInfo stInfo = retrieveStatistics(toPersist, mStudents);
+                    updateGrid(stInfo);
                 } catch (ParseException e) {
                     Toast.makeText(getActivity(), R.string.wrong_date, Toast.LENGTH_SHORT).show();
                 } catch (NullPointerException e) {
@@ -228,6 +264,7 @@ public class ShowSpbuDataFragment extends BaseFragment implements DataRetriever<
                 // update favorite button state
                 try {
                     final Favorite inDb = DatabaseFactory.getHelper().getFavoritesDao().queryForSameId(toPersist);
+
                     mFavButton.setOnCheckedChangeListener(null);
                     if(inDb != null) // уже присутствует в БД, помечаем выделенным
                         mFavButton.setChecked(true);

@@ -12,10 +12,10 @@ import java.util.Date;
 @DatabaseTable(tableName = "statistics")
 public class Statistics {
 
-    @DatabaseField(generatedId = true, uniqueCombo = true)
+    @DatabaseField(generatedId = true)
     private Integer id;
 
-    @DatabaseField(foreign = true, foreignAutoRefresh = true)
+    @DatabaseField(foreign = true, foreignAutoRefresh = true, uniqueCombo = true)
     private Favorite parent;
 
     @DatabaseField(dataType = DataType.DATE_LONG, uniqueCombo = true)

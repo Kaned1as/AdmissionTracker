@@ -31,4 +31,6 @@
     <string name="no_updates_available">Нет обновлений таблицы</string>
     <string name="wrong_date">Неверный формат даты</string>
     <string name="wrong_page_format">Неверный формат страницы</string>
+    <string name="all_reclaimed">Всего забрали документов</string>
+    <string name="cannot_update_statistics">Не удалось обновить статистику</string>
 </resources>

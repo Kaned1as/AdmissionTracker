@@ -77,7 +77,7 @@
         <TextView
             android:layout_gravity="fill_horizontal"
             android:layout_columnSpan="3"
-            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:textAppearance="?android:attr/textAppearanceMedium"
             android:text="@string/above_me"
             android:id="@+id/above_label"
             android:gravity="center"
@@ -117,7 +117,7 @@
         <TextView
             android:layout_gravity="fill_horizontal"
             android:layout_columnSpan="3"
-            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:textAppearance="?android:attr/textAppearanceMedium"
             android:text="@string/statistics"
             android:id="@+id/statistics_label"
             android:gravity="center"
@@ -133,7 +133,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:id="@+id/all_given"
+                android:id="@+id/last_updated"
                 app:header_text="@string/last_updated"
                 android:layout_margin="5dp" />
 
@@ -141,8 +141,8 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:id="@+id/today_reclaimed"
-                app:header_text="@string/today_reclaimed"
+                android:id="@+id/total_reclaimed"
+                app:header_text="@string/all_reclaimed"
                 android:layout_margin="5dp" />
 
             <view class="com.adonai.admissiontracker.views.DoubleTextView"
