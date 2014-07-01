@@ -7,15 +7,18 @@ import java.text.SimpleDateFormat;
  */
 public class Constants {
 
+    public final static  SimpleDateFormat VIEW_FORMAT = new SimpleDateFormat("dd.MM.yyyy\nHH:mm:ss");
+
     // Opcodes
     public final static int GET_URL = 0;
     public final static int RELOAD_PAGE = 1;
+    public final static int UPDATE_FAVS = 2;
     public final static int NETWORK_ERROR = -1;
 
     // URLs
     public enum Universities {
         NONE,
-        SPBU("https://cabinet.spbu.ru/Lists/1k_EntryLists/", new SimpleDateFormat("dd.MM.YYYY"));
+        SPBU("https://cabinet.spbu.ru/Lists/1k_EntryLists/", new SimpleDateFormat("dd.MM.yyyy"));
 
         private String url;
         private SimpleDateFormat timeFormat;

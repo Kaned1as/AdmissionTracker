@@ -16,12 +16,31 @@ android {
         versionCode 1
         versionName "1.0"
     }
+
+    signingConfigs {
+        release {
+            storeFile file("/home/adonai/devel/keystore/Adonai")
+            storePassword "release"
+            keyAlias "adonai"
+            keyPassword "release"
+        }
+    }
+
     buildTypes {
         release {
+            debuggable false
+            signingConfig signingConfigs.release
             runProguard false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
+
+        pro {
+            debuggable false
+            signingConfig signingConfigs.release
+            applicationIdSuffix ".pro"
+        }
     }
+
 }
 
 dependencies {

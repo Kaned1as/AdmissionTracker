@@ -20,7 +20,7 @@
         android:textAppearance="?android:attr/textAppearanceLarge"
         android:id="@+id/body"
         android:gravity="center"
-        android:textSize="25sp"
+        android:textSize="16sp"
         android:textStyle="bold"
         android:background="@color/double_view_body_color"
         android:minHeight="50dp" />

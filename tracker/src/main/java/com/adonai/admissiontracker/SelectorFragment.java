@@ -112,7 +112,7 @@ public class SelectorFragment extends BaseFragment {
                         getFragmentManager()
                             .beginTransaction()
                                 .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
-                                .replace(R.id.container, ShowSpbuDataFragment.forPage(SPBU, div.text(), url))
+                                .replace(R.id.container, ShowSpbuDataFragment.forPage(SPBU, div.text(), SPBU.getUrl() + url))
                             .commit();
                     }
                 });

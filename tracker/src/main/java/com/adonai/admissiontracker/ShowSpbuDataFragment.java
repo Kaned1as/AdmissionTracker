@@ -163,22 +163,23 @@ public class ShowSpbuDataFragment extends BaseFragment implements DataRetriever<
     }
 
     private void updateGrid(StudentInfo stInfo) {
-        mListNumber.setText(stInfo.stats.getParent().getNumber().toString());
+        mListNumber.setText(stInfo.stats.getParent().getNumber().toString() + "/" + stInfo.stats.getTotalSubmitted());
         mAdmissionDate.setText(SPBU.getTimeFormat().format(stInfo.admissionDate));
         //mPoints.setText();
         //mOriginalsAbove.setText();
         //mCopiesAbove.setText();
         //mReclaimedAbove.setText();
-        mLastTimestamp.setText(SPBU.getTimeFormat().format(stInfo.stats.getTimestamp()));
+        mLastTimestamp.setText(Constants.VIEW_FORMAT.format(stInfo.stats.getTimestamp()));
         //mTotalReclaimed.setText();
         //mNeededPoints.setText();
 
         try {
+            //PreferenceFlow.class.getName();
             // update stats in DB if it's needed
             final Favorite inDb = DatabaseFactory.getHelper().getFavoritesDao().queryForSameId(stInfo.stats.getParent());
             if(inDb != null) {
                 final QueryBuilder<Statistics, Integer> qb = DatabaseFactory.getHelper().getStatDao().queryBuilder();
-                qb.where().eq("parent", inDb).and().eq("timestamp", stInfo.stats.getTimestamp());
+                qb.where().eq("parent_id", inDb).and().eq("timestamp", stInfo.stats.getTimestamp());
                 if (qb.queryForFirst() == null) // we haven't this field in DB
                     DatabaseFactory.getHelper().getStatDao().create(stInfo.stats);
             }
@@ -317,6 +318,7 @@ public class ShowSpbuDataFragment extends BaseFragment implements DataRetriever<
         final Favorite toCreate = new Favorite(getArguments().getString(TITLE_KEY), getArguments().getString(URL_KEY));
         toCreate.setParentInstitution(getArguments().getInt(INST_KEY));
         toCreate.setNumber(index);
+        toCreate.setLastUpdated(new Date(mLastUpdated));
         toCreate.setName(extractNameForStudent(mStudents.get(index - 1)));
 
         return toCreate;
