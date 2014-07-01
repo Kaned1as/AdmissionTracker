@@ -20,6 +20,7 @@ import android.widget.ToggleButton;
 
 import com.adonai.admissiontracker.database.DatabaseFactory;
 import com.adonai.admissiontracker.entities.Favorite;
+import com.adonai.admissiontracker.entities.Statistics;
 
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
@@ -27,11 +28,14 @@ import org.jsoup.select.Elements;
 import java.sql.SQLException;
 import java.text.ParseException;
 import java.util.Arrays;
+import java.util.Date;
+
+import static com.adonai.admissiontracker.Constants.Universities.SPBU;
 
 /**
  * Created by adonai on 27.06.14.
  */
-public class ShowSpbuDataFragment extends BaseFragment {
+public class ShowSpbuDataFragment extends BaseFragment implements DataRetriever<Elements> {
 
     private static final String TITLE_KEY = "page.title";       // MANDATORY
     private static final String URL_KEY = "page.url";           // MANDATORY
@@ -154,6 +158,29 @@ public class ShowSpbuDataFragment extends BaseFragment {
             .commit();
     }
 
+    @Override
+    public StudentInfo retrieveStatistics(Favorite fav, Elements data) throws ParseException {
+        final Statistics currentStatistics = new Statistics();
+        currentStatistics.setParent(fav);
+
+        final Elements myRow = data.get(fav.getNumber() - 1).children();
+        final Date currentAdmissionDate = SPBU.getTimeFormat().parse(myRow.get(5).text());
+
+        currentStatistics.setTotalSubmitted(data.size());
+        currentStatistics.setTimestamp(fav.getLastUpdated());
+
+        final StudentInfo result = new StudentInfo();
+        result.stats = currentStatistics;
+        result.admissionDate = currentAdmissionDate;
+
+        return result;
+    }
+
+    @Override
+    public BaseFragment getFragment() {
+        return this;
+    }
+
     private static class NamesAdapter extends WithZeroAdapter<Element> {
 
         public NamesAdapter(Context context, Elements objects) {
@@ -189,7 +216,8 @@ public class ShowSpbuDataFragment extends BaseFragment {
                 // update grid
                 final Favorite toPersist = createFavForStudent(position);
                 try {
-                    NetworkService.StudentInfo stInfo = getMainActivity().getService().retrieveStatisticsSpbu(mStudents, toPersist, mHandler);
+                    StudentInfo stInfo = retrieveStatistics(toPersist, mStudents);
+
 
                 } catch (ParseException e) {
                     Toast.makeText(getActivity(), R.string.wrong_date, Toast.LENGTH_SHORT).show();
