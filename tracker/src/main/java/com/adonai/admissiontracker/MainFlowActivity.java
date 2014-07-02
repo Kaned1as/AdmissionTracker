@@ -38,7 +38,6 @@ public class MainFlowActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         mServiceCaller = new Intent(this, NetworkService.class);
-        DatabaseFactory.setHelper(this);
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main_flow);
@@ -51,13 +50,15 @@ public class MainFlowActivity extends Activity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        DatabaseFactory.releaseHelper();
     }
 
     @Override
     protected void onStart() {
         super.onStart();
-        bindService(mServiceCaller, mServiceConn, BIND_AUTO_CREATE);
+        startService(mServiceCaller); // чтобы сервис не умирал после закрытия UI
+        final boolean result = bindService(mServiceCaller, mServiceConn, 0); // change to BIND_IMPORTANT
+            if(!result)
+                throw new RuntimeException("Unable to connect to service!");
     }
 
     @Override

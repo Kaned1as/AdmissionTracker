@@ -24,6 +24,7 @@ import com.adonai.admissiontracker.entities.Statistics;
 import com.adonai.admissiontracker.views.DoubleTextView;
 import com.j256.ormlite.stmt.QueryBuilder;
 
+import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
@@ -32,17 +33,15 @@ import java.text.ParseException;
 import java.util.Arrays;
 import java.util.Date;
 
-import static com.adonai.admissiontracker.Constants.Universities.SPBU;
+import static com.adonai.admissiontracker.Constants.University.SPBU;
 
 /**
  * Created by adonai on 27.06.14.
  */
-public class ShowSpbuDataFragment extends BaseFragment implements DataRetriever<Elements> {
+public class ShowSpbuDataFragment extends BaseFragment implements DataRetriever {
 
     private static final String TITLE_KEY = "page.title";       // MANDATORY
     private static final String URL_KEY = "page.url";           // MANDATORY
-    private static final String INST_KEY = "university.index";  // MANDATORY
-
     private static final String NUM_KEY = "favorite.number";
 
     private long mLastUpdated;
@@ -62,18 +61,16 @@ public class ShowSpbuDataFragment extends BaseFragment implements DataRetriever<
         final Bundle args = new Bundle();
         args.putString(TITLE_KEY, data.getTitleRaw());
         args.putString(URL_KEY, data.getUrl());
-        args.putInt(INST_KEY, data.getParentInstitution());
         args.putInt(NUM_KEY, data.getNumber());
         result.setArguments(args);
         return result;
     }
 
-    public static ShowSpbuDataFragment forPage(Constants.Universities inst, String title, String url) {
+    public static ShowSpbuDataFragment forPage(String title, String url) {
         final ShowSpbuDataFragment result = new ShowSpbuDataFragment();
         final Bundle args = new Bundle();
         args.putString(TITLE_KEY, title);
         args.putString(URL_KEY, url);
-        args.putInt(INST_KEY, inst.ordinal());
         result.setArguments(args);
         return result;
     }
@@ -196,8 +193,7 @@ public class ShowSpbuDataFragment extends BaseFragment implements DataRetriever<
             .commit();
     }
 
-    @Override
-    public StudentInfo retrieveStatistics(Favorite fav, Elements data) throws ParseException {
+    private StudentInfo retrieveStatistics(Favorite fav, Elements data) throws ParseException {
         final Statistics currentStatistics = new Statistics();
         currentStatistics.setParent(fav);
 
@@ -212,6 +208,15 @@ public class ShowSpbuDataFragment extends BaseFragment implements DataRetriever<
         result.admissionDate = currentAdmissionDate;
 
         return result;
+    }
+
+    @Override
+    public StudentInfo retrieveStatistics(Favorite fav, Document data) throws ParseException {
+        final Element tableBody = data.select("tbody").first();
+        if (tableBody == null)
+            return null;
+
+        return retrieveStatistics(fav, tableBody.children());
     }
 
     @Override
@@ -316,7 +321,7 @@ public class ShowSpbuDataFragment extends BaseFragment implements DataRetriever<
             throw new IllegalArgumentException("Unknown student index!");
 
         final Favorite toCreate = new Favorite(getArguments().getString(TITLE_KEY), getArguments().getString(URL_KEY));
-        toCreate.setParentInstitution(getArguments().getInt(INST_KEY));
+        toCreate.setParentInstitution(SPBU.ordinal());
         toCreate.setNumber(index);
         toCreate.setLastUpdated(new Date(mLastUpdated));
         toCreate.setName(extractNameForStudent(mStudents.get(index - 1)));

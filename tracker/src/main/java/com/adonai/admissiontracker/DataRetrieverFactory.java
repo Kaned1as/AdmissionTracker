@@ -1,19 +1,14 @@
 package com.adonai.admissiontracker;
 
-import com.adonai.admissiontracker.entities.Favorite;
-
-import static com.adonai.admissiontracker.Constants.Universities;
-
 /**
  * Created by adonai on 01.07.14.
  */
 public class DataRetrieverFactory {
 
-    public static DataRetriever newInstance(Favorite fav) {
-        final Universities university = Universities.values()[fav.getParentInstitution()];
-        switch (university) {
+    public static DataRetriever newInstance(Constants.University inst) {
+        switch (inst) {
             case SPBU:
-                return ShowSpbuDataFragment.forFavorite(fav);
+                return new ShowSpbuDataFragment();
             default:
                 return null;
         }

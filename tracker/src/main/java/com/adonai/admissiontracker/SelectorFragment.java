@@ -24,8 +24,8 @@ import org.jsoup.select.Elements;
 import java.sql.SQLException;
 import java.util.List;
 
-import static com.adonai.admissiontracker.Constants.Universities.NONE;
-import static com.adonai.admissiontracker.Constants.Universities.SPBU;
+import static com.adonai.admissiontracker.Constants.University.NONE;
+import static com.adonai.admissiontracker.Constants.University.SPBU;
 
 /**
  * A placeholder fragment containing a simple view.
@@ -36,7 +36,7 @@ public class SelectorFragment extends BaseFragment {
     private Spinner mFavSelector;
     private LinearLayout mSpinnersHolder;
 
-    private Constants.Universities mSelectedInstitution = NONE;
+    private Constants.University mSelectedInstitution = NONE;
 
     private AdapterView.OnItemSelectedListener mInstSelectListener = new InstitutionSelectorListener();
     private AdapterView.OnItemSelectedListener mFavSelectListener = new FavoriteSelectorListener();
@@ -112,7 +112,7 @@ public class SelectorFragment extends BaseFragment {
                         getFragmentManager()
                             .beginTransaction()
                                 .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
-                                .replace(R.id.container, ShowSpbuDataFragment.forPage(SPBU, div.text(), SPBU.getUrl() + url))
+                                .replace(R.id.container, ShowSpbuDataFragment.forPage(div.text(), SPBU.getUrl() + url))
                             .commit();
                     }
                 });
@@ -147,7 +147,7 @@ public class SelectorFragment extends BaseFragment {
         @Override
         public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
             mSpinnersHolder.removeAllViews();
-            mSelectedInstitution = Constants.Universities.values()[position];
+            mSelectedInstitution = Constants.University.values()[position];
             switch (mSelectedInstitution) {
                 case NONE: // nothing selected
                     break;

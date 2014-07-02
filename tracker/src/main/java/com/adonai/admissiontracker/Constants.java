@@ -16,19 +16,19 @@ public class Constants {
     public final static int NETWORK_ERROR = -1;
 
     // URLs
-    public enum Universities {
+    public enum University {
         NONE,
         SPBU("https://cabinet.spbu.ru/Lists/1k_EntryLists/", new SimpleDateFormat("dd.MM.yyyy"));
 
         private String url;
         private SimpleDateFormat timeFormat;
 
-        Universities(String url, SimpleDateFormat timeFormat) {
+        University(String url, SimpleDateFormat timeFormat) {
             this.url = url;
             this.timeFormat = timeFormat;
         }
 
-        Universities() {
+        University() {
         }
 
         public String getUrl() {

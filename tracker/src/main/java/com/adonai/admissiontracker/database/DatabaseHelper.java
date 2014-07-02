@@ -20,8 +20,8 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
 
     private static final String TAG = DatabaseHelper.class.getSimpleName();
 
-    //имя файла базы данных который будет храниться в /data/data/APPNAME/DATABASE_NAME.db
-    private static final String DATABASE_NAME ="myappname.db";
+    //имя файла базы данных который будет храниться в /data/data/APPNAME/DATABASE_NAME
+    private static final String DATABASE_NAME ="admissions.db";
 
     //с каждым увеличением версии, при нахождении в устройстве БД с предыдущей версией будет выполнен метод onUpgrade();
     private static final int DATABASE_VERSION = 1;
