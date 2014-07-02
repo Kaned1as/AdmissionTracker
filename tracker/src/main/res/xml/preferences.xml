@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
-    <CheckBoxPreference
+    <com.adonai.admissiontracker.CheckProPreference
         android:key="auto.update.key"
         android:title="@string/notify_updates"
         android:summary="@string/notify_updates_sum"

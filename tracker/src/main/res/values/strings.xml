@@ -36,4 +36,6 @@
     <string name="notify_updates">Уведомлять об обновлениях</string>
     <string name="notify_updates_sum">Уведомлять об обновлениях избранных страниц и вести статистику обновлений</string>
     <string name="updates_present">Есть обновления страниц</string>
+    <string name="but_excuse">Увы!</string>
+    <string name="only_pro">Эта функция доступна только в про-версии</string>
 </resources>
