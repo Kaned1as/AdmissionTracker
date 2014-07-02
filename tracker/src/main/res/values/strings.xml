@@ -33,4 +33,7 @@
     <string name="wrong_page_format">Неверный формат страницы</string>
     <string name="all_reclaimed">Всего забрали документов</string>
     <string name="cannot_update_statistics">Не удалось обновить статистику</string>
+    <string name="notify_updates">Уведомлять об обновлениях</string>
+    <string name="notify_updates_sum">Уведомлять об обновлениях избранных страниц и вести статистику обновлений</string>
+    <string name="updates_present">Есть обновления страниц</string>
 </resources>
