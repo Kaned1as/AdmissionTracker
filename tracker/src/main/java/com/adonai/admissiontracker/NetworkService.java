@@ -26,13 +26,12 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 
 import java.io.IOException;
-import java.sql.SQLException;
 import java.util.List;
 
 public class NetworkService extends Service implements Handler.Callback, SharedPreferences.OnSharedPreferenceChangeListener {
 
-    private final static String PREF_AUTOUPDATE = "auto.update.key";
-    private final static String PREF_CLICKTIME = "last.click.time";
+    public final static String PREF_AUTOUPDATE = "auto.update.key";
+    public final static String PREF_CLICKTIME = "last.click.time";
 
     private final static long UPDATE_INTERVAL = 300000; // 5 минут
     private final static long DROP_MARK_INTERVAL = 86400000; // 1 день

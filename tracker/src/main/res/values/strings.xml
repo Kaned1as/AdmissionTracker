@@ -38,4 +38,5 @@
     <string name="updates_present">Есть обновления страниц</string>
     <string name="but_excuse">Увы!</string>
     <string name="only_pro">Эта функция доступна только в про-версии</string>
+    <string name="click_ad">Покликать рекламу...</string>
 </resources>
