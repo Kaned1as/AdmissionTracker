@@ -34,6 +34,7 @@ public class CheckProPreference extends CheckBoxPreference {
                 builder.setTitle(R.string.but_excuse);
                 builder.setMessage(R.string.only_pro);
                 builder.create().show();
+                return true;
             }
         });
     }
