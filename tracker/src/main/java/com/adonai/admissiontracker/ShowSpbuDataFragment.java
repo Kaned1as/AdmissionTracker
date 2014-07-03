@@ -156,7 +156,10 @@ public class ShowSpbuDataFragment extends BaseFragment implements DataRetriever 
 
     private void updateNames() {
         final SpinnerAdapter nameAdapter = new NamesAdapter(getActivity(), mStudents);
+        // preserve previously selected item index
+        final int previousIndex = mNameSelector.getSelectedItemPosition();
         mNameSelector.setAdapter(nameAdapter);
+        mNameSelector.setSelection(previousIndex);
     }
 
     private void updateGrid(StudentInfo stInfo) {
@@ -183,6 +186,18 @@ public class ShowSpbuDataFragment extends BaseFragment implements DataRetriever 
         } catch (SQLException e) {
             Toast.makeText(getActivity(), R.string.cannot_update_statistics, Toast.LENGTH_SHORT).show();
         }
+    }
+
+    private void clearGrid() {
+        mListNumber.setText("");
+        mAdmissionDate.setText("");
+        //mPoints.setText();
+        //mOriginalsAbove.setText();
+        //mCopiesAbove.setText();
+        //mReclaimedAbove.setText();
+        mLastTimestamp.setText("");
+        //mTotalReclaimed.setText();
+        //mNeededPoints.setText();
     }
 
     private void returnToSelections() {
@@ -281,7 +296,8 @@ public class ShowSpbuDataFragment extends BaseFragment implements DataRetriever 
                     Toast.makeText(getActivity(), R.string.database_error, Toast.LENGTH_SHORT).show();
                 }
 
-            }
+            } else
+                clearGrid();
         }
 
         @Override
