@@ -26,6 +26,7 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 
 import java.io.IOException;
+import java.util.Date;
 import java.util.List;
 
 public class NetworkService extends Service implements Handler.Callback, SharedPreferences.OnSharedPreferenceChangeListener {
@@ -97,7 +98,7 @@ public class NetworkService extends Service implements Handler.Callback, SharedP
                 try {
                     final String pageData = mClient.getPageAndContextAsString(args.first);
                     final Document result = Jsoup.parse(pageData);
-                    args.second.sendMessage(args.second.obtainMessage(Constants.GET_URL, new NetworkInfo(result, mClient.getCurrentURL(), mClient.getLastModified())));
+                    args.second.sendMessage(args.second.obtainMessage(Constants.GET_URL, new NetworkInfo(result, mClient.getLastModified())));
                 } catch (IOException e) {
                     args.second.sendMessage(args.second.obtainMessage(Constants.NETWORK_ERROR, R.string.network_error, 0, null));
                 }
@@ -112,6 +113,7 @@ public class NetworkService extends Service implements Handler.Callback, SharedP
                         final Constants.University institution = Constants.University.values()[curFav.getParentInstitution()];
                         final DataRetriever statRetriever = DataRetrieverFactory.newInstance(institution);
                         final Statistics stats = statRetriever.retrieveStatistics(curFav, page).stats;
+                        stats.setTimestamp(new Date(mClient.getLastModified()));
 
                         final NotificationManager nm = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
                         final QueryBuilder<Statistics, Integer> qb = DatabaseFactory.getHelper().getStatDao().queryBuilder();
@@ -155,12 +157,10 @@ public class NetworkService extends Service implements Handler.Callback, SharedP
 
     public static class NetworkInfo {
         public Document content;
-        public String fullURL;
         public long lastModified;
 
-        public NetworkInfo(Document content, String fullURL, long lastModified) {
+        public NetworkInfo(Document content, long lastModified) {
             this.content = content;
-            this.fullURL = fullURL;
             this.lastModified = lastModified;
         }
     }

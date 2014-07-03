@@ -40,7 +40,7 @@ public class CheckProPreference extends CheckBoxPreference {
         setOnPreferenceClickListener(new OnPreferenceClickListener() {
             @Override
             public boolean onPreferenceClick(Preference preference) {
-                if(isChecked())
+                if(isChecked()) // делать нечего, всё честно
                     CheckProPreference.super.onClick();
                 else {
                     final AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
@@ -53,6 +53,18 @@ public class CheckProPreference extends CheckBoxPreference {
                             final MobclixIABRectangleMAdView adView = new MobclixIABRectangleMAdView(getContext());
                             adBuilder.setView(adView);
                             final Dialog advertiseDialog = adBuilder.create();
+                            advertiseDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+                                @Override
+                                public void onDismiss(DialogInterface dialog) {
+                                    adView.pause();
+                                }
+                            });
+                            advertiseDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
+                                @Override
+                                public void onCancel(DialogInterface dialog) {
+                                    adView.pause();
+                                }
+                            });
                             adView.addMobclixAdViewListener(new MobclixAdViewListener() {
 
                                 @Override
@@ -72,7 +84,6 @@ public class CheckProPreference extends CheckBoxPreference {
 
                                     // extend clicktime for a day
                                     getEditor().putLong(NetworkService.PREF_CLICKTIME, System.currentTimeMillis()).apply();
-                                    adView.pause();
                                     advertiseDialog.dismiss();
                                 }
 
