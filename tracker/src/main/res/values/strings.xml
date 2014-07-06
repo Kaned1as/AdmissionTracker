@@ -4,6 +4,7 @@
     <string name="action_settings">Настройки</string>
     <string name="select_institution">Выберите ВУЗ</string>
     <string name="spbu">СПбГУ</string>
+    <string name="spb_gmu">СПб ГМУ</string>
     <string name="network_error">Ошибка сети</string>
     <string name="wait_please">Пожалуйста, подождите…</string>
     <string name="retrieving_data">Загрузка данных…</string>
@@ -29,7 +30,7 @@
     <string name="last_updated">Последняя версия</string>
     <string name="refresh">Обновить</string>
     <string name="no_updates_available">Нет обновлений таблицы</string>
-    <string name="wrong_date">Неверный формат даты</string>
+    <string name="wrong_data">Неверный формат данных</string>
     <string name="wrong_page_format">Неверный формат страницы</string>
     <string name="all_reclaimed">Всего забрали документов</string>
     <string name="cannot_update_statistics">Не удалось обновить статистику</string>
@@ -39,4 +40,7 @@
     <string name="but_excuse">Увы!</string>
     <string name="only_pro">Эта функция доступна только в про-версии</string>
     <string name="click_ad">Покликать рекламу...</string>
+    <string name="buy_pro">Купить про-версию</string>
+    <string name="name_not_found">Имя не найдено в таблице!</string>
+    <string name="invalid_url">Неверная ссылка</string>
 </resources>

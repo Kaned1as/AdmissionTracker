@@ -4,6 +4,8 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
+import android.net.Uri;
 import android.preference.CheckBoxPreference;
 import android.preference.Preference;
 import android.util.AttributeSet;
@@ -108,6 +110,14 @@ public class CheckProPreference extends CheckBoxPreference {
                                 }
                             });
                             advertiseDialog.show();
+                        }
+                    });
+                    builder.setNeutralButton(R.string.buy_pro, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            final Intent intent = new Intent(Intent.ACTION_VIEW);
+                            intent.setData(Uri.parse("market://details?id=com.adonai.admissiontracker.pro"));
+                            getContext().startActivity(intent);
                         }
                     });
                     builder.create().show();

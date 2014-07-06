@@ -1,15 +1,14 @@
 package com.adonai.admissiontracker.entities;
 
-import com.j256.ormlite.field.DataType;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.field.ForeignCollectionField;
 import com.j256.ormlite.table.DatabaseTable;
 
 import java.util.Collection;
-import java.util.Date;
 
 /**
  * Entity representing favorite holder
+ * These entries are ones that do not change over time
  *
  * @author Adonai
  */
@@ -26,13 +25,13 @@ public class Favorite {
     private String name;
 
     @DatabaseField(canBeNull = false)
-    private Integer number;
-
-    @DatabaseField(canBeNull = false)
     private Integer parentInstitution;
 
-    @DatabaseField(dataType = DataType.DATE_LONG)
-    private Date lastUpdated;
+    @DatabaseField
+    private Integer maxBudgetCount;
+
+    @DatabaseField
+    private Integer priority;
 
     @ForeignCollectionField
     private Collection<Statistics> statList;
@@ -47,7 +46,7 @@ public class Favorite {
     }
 
     public String getTitle() {
-        return title + " - " + name + " - " + number;
+        return title + " - " + name;
     }
 
     public String getTitleRaw() {
@@ -74,14 +73,6 @@ public class Favorite {
         this.name = name;
     }
 
-    public Date getLastUpdated() {
-        return lastUpdated;
-    }
-
-    public void setLastUpdated(Date lastUpdated) {
-        this.lastUpdated = lastUpdated;
-    }
-
     public Integer getParentInstitution() {
         return parentInstitution;
     }
@@ -90,11 +81,19 @@ public class Favorite {
         this.parentInstitution = parentInstitution;
     }
 
-    public Integer getNumber() {
-        return number;
+    public Integer getMaxBudgetCount() {
+        return maxBudgetCount;
     }
 
-    public void setNumber(Integer number) {
-        this.number = number;
+    public void setMaxBudgetCount(Integer maxBudgetCount) {
+        this.maxBudgetCount = maxBudgetCount;
+    }
+
+    public Integer getPriority() {
+        return priority;
+    }
+
+    public void setPriority(Integer priority) {
+        this.priority = priority;
     }
 }

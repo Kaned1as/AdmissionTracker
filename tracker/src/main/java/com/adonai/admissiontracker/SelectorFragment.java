@@ -21,11 +21,14 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.sql.SQLException;
 import java.util.List;
 
 import static com.adonai.admissiontracker.Constants.University.NONE;
 import static com.adonai.admissiontracker.Constants.University.SPBU;
+import static com.adonai.admissiontracker.Constants.University.SPB_GMU;
 
 /**
  * A placeholder fragment containing a simple view.
@@ -92,9 +95,43 @@ public class SelectorFragment extends BaseFragment {
             case SPBU:
                 setLayoutSpbu(doc.select(".treeview > ul").first());
                 break;
+            case SPB_GMU:
+                setLayoutSpbGmu(doc);
+                break;
             default:
                 break;
         }
+    }
+
+    private void setLayoutSpbGmu(final Element tree) {
+        final Elements links = tree.select("a[href]");
+        final Spinner levelSelector = new Spinner(getActivity());
+        final SpbGmuElementAdapter elementAdapter = new SpbGmuElementAdapter(getActivity(), links);
+        levelSelector.setAdapter(elementAdapter);
+        levelSelector.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                final Element selectedLink = elementAdapter.getItem(position);
+                if(selectedLink != null) {
+                    try {
+                        final Integer budgetCount = Integer.valueOf(selectedLink.parent().nextElementSibling().nextElementSibling().text());
+                        getFragmentManager()
+                                .beginTransaction()
+                                .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
+                                .replace(R.id.container, ShowSpbuGmuDataFragment.forPage(selectedLink.text(), new URL(new URL(SPB_GMU.getUrl()), selectedLink.attr("href")).toString(), budgetCount))
+                                .commit();
+                    } catch (MalformedURLException e) {
+                        Toast.makeText(getActivity(), R.string.invalid_url, Toast.LENGTH_SHORT).show();
+                    } // should never happen
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
+        mSpinnersHolder.addView(levelSelector);
     }
 
     private void setLayoutSpbu(final Element tree) {
@@ -155,6 +192,10 @@ public class SelectorFragment extends BaseFragment {
                     mProgressDialog.show();
                     getMainActivity().getService().retrievePage(SPBU.getUrl(), mHandler);
                     break;
+                case SPB_GMU:
+                    mProgressDialog.show();
+                    getMainActivity().getService().retrievePage(SPB_GMU.getUrl(), mHandler);
+                    break;
                 default:
                     break;
             }
@@ -209,6 +250,30 @@ public class SelectorFragment extends BaseFragment {
 
             text = (TextView) view.findViewById(android.R.id.text1);
             text.setText(item == null ? getContext().getString(R.string.select_from_list) : item.child(0).text().substring(1));
+
+            return view;
+        }
+    }
+
+    private class SpbGmuElementAdapter extends WithZeroAdapter<Element> {
+
+        public SpbGmuElementAdapter(Context context, Elements objects) {
+            super(context, objects);
+        }
+
+        @Override
+        public View newView(int position, View convertView, ViewGroup parent) {
+            final View view;
+            final TextView text;
+            final Element item = getItem(position);
+
+            if (convertView == null)
+                view = LayoutInflater.from(getContext()).inflate(R.layout.tall_list_item, parent, false);
+            else
+                view = convertView;
+
+            text = (TextView) view.findViewById(android.R.id.text1);
+            text.setText(item == null ? getContext().getString(R.string.select_from_list) : item.text());
 
             return view;
         }

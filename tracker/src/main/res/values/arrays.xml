@@ -3,6 +3,6 @@
     <string-array name="institutions_array">
         <item>@string/select_institution</item>
         <item>@string/spbu</item>
+        <item>@string/spb_gmu</item>
     </string-array>
-
 </resources>

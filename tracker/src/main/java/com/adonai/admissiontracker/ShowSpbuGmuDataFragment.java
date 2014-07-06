@@ -27,21 +27,20 @@ import org.jsoup.select.Elements;
 
 import java.sql.SQLException;
 import java.text.ParseException;
-import java.util.Arrays;
 import java.util.Date;
 
 import static com.adonai.admissiontracker.Constants.University.SPBU;
+import static com.adonai.admissiontracker.Constants.University.SPB_GMU;
 
 /**
- * Created by adonai on 27.06.14.
+ * Created by adonai on 05.07.14.
  */
-public class ShowSpbuDataFragment extends AbstractShowDataFragment implements DataRetriever {
+public class ShowSpbuGmuDataFragment extends AbstractShowDataFragment implements DataRetriever {
 
     private static final String TITLE_KEY = "page.title";       // MANDATORY
     private static final String URL_KEY = "page.url";           // MANDATORY
     private static final String NAME_KEY = "favorite.name";
-
-    private long mLastUpdated;
+    private static final String MAX_BUDGET = "max.budget.number";
 
     private Elements mStudents = null;
 
@@ -53,21 +52,23 @@ public class ShowSpbuDataFragment extends AbstractShowDataFragment implements Da
     private NameSelectorListener mNameSelectorListener = new NameSelectorListener();
     private FavoriteClickListener mFavClickListener = new FavoriteClickListener();
 
-    public static ShowSpbuDataFragment forFavorite(Favorite data) {
-        final ShowSpbuDataFragment result = new ShowSpbuDataFragment();
+    public static ShowSpbuGmuDataFragment forFavorite(Favorite data) {
+        final ShowSpbuGmuDataFragment result = new ShowSpbuGmuDataFragment();
         final Bundle args = new Bundle();
         args.putString(TITLE_KEY, data.getTitleRaw());
         args.putString(URL_KEY, data.getUrl());
+        args.putInt(MAX_BUDGET, data.getMaxBudgetCount());
         args.putString(NAME_KEY, data.getName());
         result.setArguments(args);
         return result;
     }
 
-    public static ShowSpbuDataFragment forPage(String title, String url) {
-        final ShowSpbuDataFragment result = new ShowSpbuDataFragment();
+    public static ShowSpbuGmuDataFragment forPage(String title, String url, int maxCount) {
+        final ShowSpbuGmuDataFragment result = new ShowSpbuGmuDataFragment();
         final Bundle args = new Bundle();
         args.putString(TITLE_KEY, title);
         args.putString(URL_KEY, url);
+        args.putInt(MAX_BUDGET, maxCount);
         result.setArguments(args);
         return result;
     }
@@ -98,23 +99,6 @@ public class ShowSpbuDataFragment extends AbstractShowDataFragment implements Da
     }
 
     @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        super.onCreateOptionsMenu(menu, inflater);
-        inflater.inflate(R.menu.data_fragment, menu);
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.refresh:
-                mProgressDialog.show();
-                getMainActivity().getService().retrievePage(getArguments().getString(URL_KEY), mHandler);
-                break;
-        }
-        return super.onOptionsItemSelected(item);
-    }
-
-    @Override
     public void onStart() {
         super.onStart();
 
@@ -134,10 +118,8 @@ public class ShowSpbuDataFragment extends AbstractShowDataFragment implements Da
                 if (tableBody == null) {
                     Toast.makeText(getActivity(), R.string.no_data_available, Toast.LENGTH_SHORT).show();
                     returnToSelections();
-                } else if(mLastUpdated == 0 || mLastUpdated < ni.lastModified) {
+                } else  {
                     mStudents = tableBody.children();
-                    mLastUpdated = ni.lastModified;
-
                     updateNames();
                     try {
                         if(getArguments().containsKey(NAME_KEY)) { // it's favorite from DB
@@ -148,8 +130,7 @@ public class ShowSpbuDataFragment extends AbstractShowDataFragment implements Da
                     } catch (ParseException e) {
                         Toast.makeText(getActivity(), R.string.name_not_found, Toast.LENGTH_SHORT).show();
                     }
-                } else
-                    Toast.makeText(getActivity(), R.string.no_updates_available, Toast.LENGTH_SHORT).show();
+                }
                 break;
         }
 
@@ -164,80 +145,26 @@ public class ShowSpbuDataFragment extends AbstractShowDataFragment implements Da
         mNameSelector.setSelection(previousIndex);
     }
 
-    private void updateGrid(Favorite fav, StudentInfo stInfo) throws ParseException {
-        mListNumber.setText(mStudents.indexOf(findRowWithName(mStudents, fav.getName())) + "/" + stInfo.stats.getTotalSubmitted());
-        mAdmissionDate.setText(SPBU.getTimeFormat().format(stInfo.admissionDate));
-        //mPoints.setText();
-        //mOriginalsAbove.setText();
-        //mCopiesAbove.setText();
-        //mReclaimedAbove.setText();
-        mLastTimestamp.setText(Constants.VIEW_FORMAT.format(stInfo.stats.getTimestamp()));
-        //mTotalReclaimed.setText();
-        //mNeededPoints.setText();
-
-        try {
-            //PreferenceFlow.class.getName();
-            // update stats in DB if it's needed
-            final Favorite inDb = DatabaseFactory.getHelper().getFavoritesDao().queryForSameId(stInfo.stats.getParent());
-            if(inDb != null) {
-                final QueryBuilder<Statistics, Integer> qb = DatabaseFactory.getHelper().getStatDao().queryBuilder();
-                qb.where().eq("parent_id", inDb).and().eq("timestamp", stInfo.stats.getTimestamp());
-                if (qb.queryForFirst() == null) // we haven't this field in DB
-                    DatabaseFactory.getHelper().getStatDao().create(stInfo.stats);
-            }
-        } catch (SQLException e) {
-            Toast.makeText(getActivity(), R.string.cannot_update_statistics, Toast.LENGTH_SHORT).show();
-        }
-    }
-
-    private void clearGrid() {
-        mListNumber.setText("");
-        mAdmissionDate.setText("");
-        //mPoints.setText();
-        //mOriginalsAbove.setText();
-        //mCopiesAbove.setText();
-        //mReclaimedAbove.setText();
-        mLastTimestamp.setText("");
-        //mTotalReclaimed.setText();
-        //mNeededPoints.setText();
-    }
-
-    private void returnToSelections() {
-        getFragmentManager()
-            .beginTransaction()
-                .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
-                .replace(R.id.container, new SelectorFragment())
-            .commit();
-    }
-
-    private StudentInfo retrieveStatistics(Favorite fav, Elements data) throws ParseException {
-        final StudentInfo result = new StudentInfo();
-
-        final Statistics currentStatistics = new Statistics();
-        currentStatistics.setParent(fav);
-
-        final Element myRow = findRowWithName(data, fav.getName());
-        final Elements myColumns = myRow.children();
-        final Date currentAdmissionDate = SPBU.getTimeFormat().parse(myColumns.get(5).text());
-
-        currentStatistics.setTotalSubmitted(data.size());
-
-        result.stats = currentStatistics;
-        result.admissionDate = currentAdmissionDate;
-
-        return result;
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        inflater.inflate(R.menu.data_fragment, menu);
     }
 
     @Override
-    public StudentInfo retrieveStatistics(Favorite fav, NetworkService.NetworkInfo data) throws ParseException {
-        final Element tableBody = data.content.select("tbody").first();
-        if (tableBody == null)
-            return null;
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.refresh:
+                mProgressDialog.show();
+                getMainActivity().getService().retrievePage(getArguments().getString(URL_KEY), mHandler);
+                break;
+        }
+        return super.onOptionsItemSelected(item);
+    }
 
-        final StudentInfo stInfo = retrieveStatistics(fav, tableBody.children());
-        stInfo.stats.setTimestamp(new Date(data.lastModified));
-
-        return stInfo;
+    @Override
+    public StudentInfo retrieveStatistics(Favorite fav, NetworkService.NetworkInfo data) throws Exception {
+        return null;
     }
 
     @Override
@@ -287,6 +214,62 @@ public class ShowSpbuDataFragment extends AbstractShowDataFragment implements Da
         }
     }
 
+    private void updateGrid(Favorite fav, StudentInfo stInfo) throws ParseException {
+        mListNumber.setText(mStudents.indexOf(findRowWithName(mStudents, fav.getName())) + "/" + stInfo.stats.getTotalSubmitted());
+        mAdmissionDate.setText(SPBU.getTimeFormat().format(stInfo.admissionDate));
+        //mPoints.setText();
+        //mOriginalsAbove.setText();
+        //mCopiesAbove.setText();
+        //mReclaimedAbove.setText();
+        mLastTimestamp.setText(Constants.VIEW_FORMAT.format(stInfo.stats.getTimestamp()));
+        //mTotalReclaimed.setText();
+        //mNeededPoints.setText();
+
+        try {
+            //PreferenceFlow.class.getName();
+            // update stats in DB if it's needed
+            final Favorite inDb = DatabaseFactory.getHelper().getFavoritesDao().queryForSameId(stInfo.stats.getParent());
+            if(inDb != null) {
+                final QueryBuilder<Statistics, Integer> qb = DatabaseFactory.getHelper().getStatDao().queryBuilder();
+                qb.where().eq("parent_id", inDb).and().eq("timestamp", stInfo.stats.getTimestamp());
+                if (qb.queryForFirst() == null) // we haven't this field in DB
+                    DatabaseFactory.getHelper().getStatDao().create(stInfo.stats);
+            }
+        } catch (SQLException e) {
+            Toast.makeText(getActivity(), R.string.cannot_update_statistics, Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private StudentInfo retrieveStatistics(Favorite fav, Elements data) throws ParseException {
+        final StudentInfo result = new StudentInfo();
+
+        final Statistics currentStatistics = new Statistics();
+        currentStatistics.setParent(fav);
+
+        final Element myRow = findRowWithName(data, fav.getName());
+        final Elements myColumns = myRow.children();
+        final Date currentAdmissionDate = SPBU.getTimeFormat().parse(myColumns.get(5).text());
+
+        currentStatistics.setTotalSubmitted(data.size());
+
+        result.stats = currentStatistics;
+        result.admissionDate = currentAdmissionDate;
+
+        return result;
+    }
+
+    private void clearGrid() {
+        mListNumber.setText("");
+        mAdmissionDate.setText("");
+        //mPoints.setText();
+        //mOriginalsAbove.setText();
+        //mCopiesAbove.setText();
+        //mReclaimedAbove.setText();
+        mLastTimestamp.setText("");
+        //mTotalReclaimed.setText();
+        //mNeededPoints.setText();
+    }
+
     private class FavoriteClickListener implements CompoundButton.OnCheckedChangeListener {
 
         @Override
@@ -318,15 +301,23 @@ public class ShowSpbuDataFragment extends AbstractShowDataFragment implements Da
             throw new IllegalArgumentException("Unknown student index!");
 
         final Favorite toCreate = new Favorite(getArguments().getString(TITLE_KEY), getArguments().getString(URL_KEY));
-        toCreate.setParentInstitution(SPBU.ordinal());
+        toCreate.setParentInstitution(SPB_GMU.ordinal());
         toCreate.setName(extractNameForStudent(mStudents.get(index - 1)));
 
         return toCreate;
     }
 
+    private void returnToSelections() {
+        getFragmentManager()
+                .beginTransaction()
+                .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
+                .replace(R.id.container, new SelectorFragment())
+                .commit();
+    }
+
     @Override
     protected String extractNameForStudent(Element row) {
         final Elements columns = row.children();
-        return Utils.join(Arrays.asList(columns.get(1).text(), columns.get(2).text(), columns.get(3).text()), " ");
+        return columns.get(1).text();
     }
 }

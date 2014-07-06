@@ -3,8 +3,6 @@ package com.adonai.admissiontracker;
 import com.adonai.admissiontracker.entities.Favorite;
 import com.adonai.admissiontracker.entities.Statistics;
 
-import org.jsoup.nodes.Document;
-
 import java.util.Date;
 
 /**
@@ -17,7 +15,7 @@ public interface DataRetriever {
         public Date admissionDate;
     }
 
-    StudentInfo retrieveStatistics(Favorite fav, Document page) throws Exception;
+    StudentInfo retrieveStatistics(Favorite fav, NetworkService.NetworkInfo page) throws Exception;
 
     BaseFragment getFragment();
 

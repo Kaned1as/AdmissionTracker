@@ -7,6 +7,9 @@ import com.j256.ormlite.table.DatabaseTable;
 import java.util.Date;
 
 /**
+ * Entity representing statistics
+ * These entries change over time
+ *
  * Created by adonai on 29.06.14.
  */
 @DatabaseTable(tableName = "statistics")
