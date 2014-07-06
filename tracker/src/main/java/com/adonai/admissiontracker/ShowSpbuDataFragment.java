@@ -221,6 +221,7 @@ public class ShowSpbuDataFragment extends AbstractShowDataFragment implements Da
         final Date currentAdmissionDate = SPBU.getTimeFormat().parse(myColumns.get(5).text());
 
         currentStatistics.setTotalSubmitted(data.size());
+        currentStatistics.setTimestamp(new Date(mLastUpdated));
 
         result.stats = currentStatistics;
         result.admissionDate = currentAdmissionDate;
