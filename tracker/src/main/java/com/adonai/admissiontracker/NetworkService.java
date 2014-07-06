@@ -129,7 +129,9 @@ public class NetworkService extends Service implements Handler.Callback, SharedP
                         if(System.currentTimeMillis() > lastClicked + DROP_MARK_INTERVAL)
                             mPreferences.edit().putBoolean(PREF_AUTOUPDATE, false).apply();
                     }
-                } catch (Exception ignored) {}
+                } catch (Exception ignored) {
+                    //throw new RuntimeException(ignored);
+                }
                 break;
             default:
                 break;

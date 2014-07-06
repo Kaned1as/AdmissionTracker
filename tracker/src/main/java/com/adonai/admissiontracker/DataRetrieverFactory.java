@@ -9,6 +9,8 @@ public class DataRetrieverFactory {
         switch (inst) {
             case SPBU:
                 return new ShowSpbuDataFragment();
+            case SPB_GMU:
+                return new ShowSpbuGmuDataFragment();
             default:
                 return null;
         }
