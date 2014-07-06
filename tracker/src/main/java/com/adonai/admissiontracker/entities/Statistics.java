@@ -28,6 +28,9 @@ public class Statistics {
     private Integer originalsAbove;
 
     @DatabaseField
+    private Integer copiesAbove;
+
+    @DatabaseField
     private Integer reclaimedAbove;
 
     @DatabaseField
@@ -101,5 +104,13 @@ public class Statistics {
 
     public void setNeededPoints(Integer neededPoints) {
         this.neededPoints = neededPoints;
+    }
+
+    public Integer getCopiesAbove() {
+        return copiesAbove;
+    }
+
+    public void setCopiesAbove(Integer copiesAbove) {
+        this.copiesAbove = copiesAbove;
     }
 }

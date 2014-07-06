@@ -1,0 +1,158 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MainFlow$PlaceholderFragment">
+
+    <LinearLayout
+        android:id="@+id/spinner_frame"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:prompt="@string/select_name"
+        android:background="@color/name_selector_color"
+        android:layout_margin="15dp"
+        android:orientation="horizontal">
+
+        <Spinner
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:id="@+id/name_spinner"
+            android:prompt="@string/select_name"
+            android:layout_weight="1" />
+
+        <ToggleButton
+            android:id="@+id/favorite_button"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:background="@android:drawable/btn_star"
+            android:layout_gravity="center"
+            android:visibility="invisible"
+            android:textOff=""
+            android:textOn="" />
+
+    </LinearLayout>
+
+
+
+    <GridLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/spinner_frame"
+        android:layout_centerHorizontal="true"
+        android:columnCount="3"
+        android:rowCount="6"
+        android:layout_margin="10dp">
+
+        <LinearLayout
+            android:layout_gravity="fill_horizontal"
+            android:layout_columnSpan="3">
+
+            <view class="com.adonai.admissiontracker.views.DoubleTextView"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:id="@+id/list_number"
+                app:header_text="@string/number"
+                android:layout_margin="5dp" />
+
+            <view class="com.adonai.admissiontracker.views.DoubleTextView"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:id="@+id/priority"
+                app:header_text="@string/priority"
+                android:layout_margin="5dp" />
+
+            <view class="com.adonai.admissiontracker.views.DoubleTextView"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:id="@+id/points"
+                app:header_text="@string/points_got"
+                android:layout_margin="5dp" />
+        </LinearLayout>
+
+        <TextView
+            android:layout_gravity="fill_horizontal"
+            android:layout_columnSpan="3"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:text="@string/better_than_me"
+            android:id="@+id/above_label"
+            android:gravity="center"
+            android:background="@color/header_color"
+            android:layout_marginLeft="5dp"
+            android:layout_marginRight="5dp" />
+
+        <LinearLayout
+            android:layout_gravity="fill_horizontal"
+            android:layout_columnSpan="3">
+
+            <view class="com.adonai.admissiontracker.views.DoubleTextView"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:id="@+id/originals"
+                app:header_text="@string/originals"
+                android:layout_margin="5dp" />
+
+            <view class="com.adonai.admissiontracker.views.DoubleTextView"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:id="@+id/copies"
+                app:header_text="@string/copies"
+                android:layout_margin="5dp" />
+
+            <view class="com.adonai.admissiontracker.views.DoubleTextView"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:id="@+id/reclaimed_above"
+                app:header_text="@string/reclaimed"
+                android:layout_margin="5dp" />
+        </LinearLayout>
+
+        <TextView
+            android:layout_gravity="fill_horizontal"
+            android:layout_columnSpan="3"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:text="@string/statistics"
+            android:id="@+id/statistics_label"
+            android:gravity="center"
+            android:background="@color/header_color"
+            android:layout_marginLeft="5dp"
+            android:layout_marginRight="5dp" />
+
+        <LinearLayout
+            android:layout_gravity="fill_horizontal"
+            android:layout_columnSpan="3">
+
+            <view class="com.adonai.admissiontracker.views.DoubleTextView"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:id="@+id/last_updated"
+                app:header_text="@string/last_updated"
+                android:layout_margin="5dp" />
+
+            <view class="com.adonai.admissiontracker.views.DoubleTextView"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:id="@+id/total_reclaimed"
+                app:header_text="@string/all_reclaimed"
+                android:layout_margin="5dp" />
+
+            <view class="com.adonai.admissiontracker.views.DoubleTextView"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:id="@+id/needed_points"
+                app:header_text="@string/needed_points"
+                android:layout_margin="5dp" />
+        </LinearLayout>
+    </GridLayout>
+
+</RelativeLayout>

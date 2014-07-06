@@ -75,7 +75,7 @@ public class ShowSpbuDataFragment extends AbstractShowDataFragment implements Da
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         setHasOptionsMenu(true);
-        final View rootView = inflater.inflate(R.layout.show_data_fragment, container, false);
+        final View rootView = inflater.inflate(R.layout.show_data_spbu_fragment, container, false);
 
         mNameSelector = (Spinner) rootView.findViewById(R.id.name_spinner);
         mNameSelector.setOnItemSelectedListener(mNameSelectorListener);
@@ -165,7 +165,7 @@ public class ShowSpbuDataFragment extends AbstractShowDataFragment implements Da
     }
 
     private void updateGrid(Favorite fav, StudentInfo stInfo) throws ParseException {
-        mListNumber.setText(mStudents.indexOf(findRowWithName(mStudents, fav.getName())) + "/" + stInfo.stats.getTotalSubmitted());
+        mListNumber.setText((mStudents.indexOf(findRowWithName(mStudents, fav.getName())) + 1) + "/" + stInfo.stats.getTotalSubmitted());
         mAdmissionDate.setText(SPBU.getTimeFormat().format(stInfo.admissionDate));
         //mPoints.setText();
         //mOriginalsAbove.setText();
@@ -243,6 +243,11 @@ public class ShowSpbuDataFragment extends AbstractShowDataFragment implements Da
     @Override
     public BaseFragment getFragment() {
         return this;
+    }
+
+    @Override
+    public boolean canTrackTime() {
+        return true;
     }
 
     private class NameSelectorListener implements AdapterView.OnItemSelectedListener {

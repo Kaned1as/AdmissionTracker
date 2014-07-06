@@ -33,6 +33,9 @@ public class Favorite {
     @DatabaseField
     private Integer priority;
 
+    @DatabaseField
+    private Integer points;
+
     @ForeignCollectionField
     private Collection<Statistics> statList;
 
@@ -95,5 +98,13 @@ public class Favorite {
 
     public void setPriority(Integer priority) {
         this.priority = priority;
+    }
+
+    public Integer getPoints() {
+        return points;
+    }
+
+    public void setPoints(Integer points) {
+        this.points = points;
     }
 }

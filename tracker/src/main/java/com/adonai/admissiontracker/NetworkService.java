@@ -117,8 +117,10 @@ public class NetworkService extends Service implements Handler.Callback, SharedP
                         if (qb.queryForFirst() == null) { // we haven't this row in DB
                             DatabaseFactory.getHelper().getStatDao().create(stats); // сохраняем текущую статистику в БД
 
-                            final Notification toShow = createNotification(Constants.VIEW_FORMAT.format(stats.getTimestamp()));
-                            nm.notify(NEWS_NOTIFICATION_ID, toShow); // запускаем уведомление
+                            if(statRetriever.canTrackTime()) {
+                                final Notification toShow = createNotification(Constants.VIEW_FORMAT.format(stats.getTimestamp()));
+                                nm.notify(NEWS_NOTIFICATION_ID, toShow); // запускаем уведомление
+                            }
                         }
                     }
 

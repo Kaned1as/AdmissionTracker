@@ -43,4 +43,6 @@
     <string name="buy_pro">Купить про-версию</string>
     <string name="name_not_found">Имя не найдено в таблице!</string>
     <string name="invalid_url">Неверная ссылка</string>
+    <string name="priority">Приоритет</string>
+    <string name="better_than_me">Лучше меня:</string>
 </resources>

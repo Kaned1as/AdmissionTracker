@@ -19,7 +19,7 @@ public class Constants {
     public enum University {
         NONE,
         SPBU("https://cabinet.spbu.ru/Lists/1k_EntryLists/", new SimpleDateFormat("dd.MM.yyyy")),
-        SPB_GMU("http://194.226.204.24/abit/statsAll.htm/", null);
+        SPB_GMU("http://194.226.204.24/abit/statsAll.htm", null);
 
         private String url;
         private SimpleDateFormat timeFormat;

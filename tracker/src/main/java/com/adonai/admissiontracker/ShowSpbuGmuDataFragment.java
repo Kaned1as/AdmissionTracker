@@ -27,9 +27,11 @@ import org.jsoup.select.Elements;
 
 import java.sql.SQLException;
 import java.text.ParseException;
+import java.util.Collections;
 import java.util.Date;
+import java.util.PriorityQueue;
+import java.util.Queue;
 
-import static com.adonai.admissiontracker.Constants.University.SPBU;
 import static com.adonai.admissiontracker.Constants.University.SPB_GMU;
 
 /**
@@ -46,7 +48,7 @@ public class ShowSpbuGmuDataFragment extends AbstractShowDataFragment implements
 
     private Spinner mNameSelector;
     private ToggleButton mFavButton;
-    private DoubleTextView mListNumber, mAdmissionDate, mPoints, mOriginalsAbove, mCopiesAbove, mReclaimedAbove;
+    private DoubleTextView mListNumber, mPriority, mPoints, mOriginalsAbove, mCopiesAbove, mReclaimedAbove;
     private DoubleTextView mLastTimestamp, mTotalReclaimed, mNeededPoints;
 
     private NameSelectorListener mNameSelectorListener = new NameSelectorListener();
@@ -76,7 +78,7 @@ public class ShowSpbuGmuDataFragment extends AbstractShowDataFragment implements
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         setHasOptionsMenu(true);
-        final View rootView = inflater.inflate(R.layout.show_data_fragment, container, false);
+        final View rootView = inflater.inflate(R.layout.show_data_spb_gmu_fragment, container, false);
 
         mNameSelector = (Spinner) rootView.findViewById(R.id.name_spinner);
         mNameSelector.setOnItemSelectedListener(mNameSelectorListener);
@@ -84,7 +86,7 @@ public class ShowSpbuGmuDataFragment extends AbstractShowDataFragment implements
         mFavButton.setOnCheckedChangeListener(mFavClickListener);
 
         mListNumber = (DoubleTextView) rootView.findViewById(R.id.list_number);
-        mAdmissionDate = (DoubleTextView) rootView.findViewById(R.id.date);
+        mPriority = (DoubleTextView) rootView.findViewById(R.id.priority);
         mPoints = (DoubleTextView) rootView.findViewById(R.id.points);
 
         mOriginalsAbove = (DoubleTextView) rootView.findViewById(R.id.originals);
@@ -164,12 +166,21 @@ public class ShowSpbuGmuDataFragment extends AbstractShowDataFragment implements
 
     @Override
     public StudentInfo retrieveStatistics(Favorite fav, NetworkService.NetworkInfo data) throws Exception {
-        return null;
+        final Element tableBody = data.content.select("tbody").first();
+        if (tableBody == null)
+            return null;
+
+        return retrieveStatistics(fav, tableBody.children());
     }
 
     @Override
     public BaseFragment getFragment() {
         return this;
+    }
+
+    @Override
+    public boolean canTrackTime() {
+        return false;
     }
 
     private class NameSelectorListener implements AdapterView.OnItemSelectedListener {
@@ -215,15 +226,15 @@ public class ShowSpbuGmuDataFragment extends AbstractShowDataFragment implements
     }
 
     private void updateGrid(Favorite fav, StudentInfo stInfo) throws ParseException {
-        mListNumber.setText(mStudents.indexOf(findRowWithName(mStudents, fav.getName())) + "/" + stInfo.stats.getTotalSubmitted());
-        mAdmissionDate.setText(SPBU.getTimeFormat().format(stInfo.admissionDate));
-        //mPoints.setText();
-        //mOriginalsAbove.setText();
-        //mCopiesAbove.setText();
-        //mReclaimedAbove.setText();
+        mListNumber.setText((mStudents.indexOf(findRowWithName(mStudents, fav.getName())) + 1) + "/" + stInfo.stats.getTotalSubmitted());
+        mPriority.setText(fav.getPriority().toString());
+        mPoints.setText(fav.getPoints().toString());
+        mOriginalsAbove.setText(stInfo.stats.getOriginalsAbove().toString());
+        mCopiesAbove.setText(stInfo.stats.getCopiesAbove().toString());
+        mReclaimedAbove.setText("0");
         mLastTimestamp.setText(Constants.VIEW_FORMAT.format(stInfo.stats.getTimestamp()));
-        //mTotalReclaimed.setText();
-        //mNeededPoints.setText();
+        mTotalReclaimed.setText("0");
+        mNeededPoints.setText(stInfo.stats.getNeededPoints().toString());
 
         try {
             //PreferenceFlow.class.getName();
@@ -248,19 +259,46 @@ public class ShowSpbuGmuDataFragment extends AbstractShowDataFragment implements
 
         final Element myRow = findRowWithName(data, fav.getName());
         final Elements myColumns = myRow.children();
-        final Date currentAdmissionDate = SPBU.getTimeFormat().parse(myColumns.get(5).text());
 
         currentStatistics.setTotalSubmitted(data.size());
+        currentStatistics.setTimestamp(new Date());
+
+        int originalsAbove = 0;
+        int copiesAbove = 0;
+        final Queue<Integer> allPoints = new PriorityQueue<>(data.size(), Collections.reverseOrder());
+        for(Element row : data) {
+            final Elements columns = row.children();
+            final int points = Integer.valueOf(columns.get(5).text());
+            allPoints.offer(points);
+            final boolean isOriginal = columns.get(6).text().equals("да");
+
+            if(points > fav.getPoints()) {
+                if (isOriginal)
+                    originalsAbove++;
+                else
+                    copiesAbove++;
+            }
+        }
+
+        int neededPoints = 0;
+        int passed = fav.getMaxBudgetCount();
+        while (allPoints.size() > 0 && passed > 0) {
+            neededPoints = allPoints.poll();
+            passed--;
+        }
+
+        currentStatistics.setCopiesAbove(copiesAbove);
+        currentStatistics.setOriginalsAbove(originalsAbove);
+        currentStatistics.setNeededPoints(neededPoints);
 
         result.stats = currentStatistics;
-        result.admissionDate = currentAdmissionDate;
 
         return result;
     }
 
     private void clearGrid() {
         mListNumber.setText("");
-        mAdmissionDate.setText("");
+        mPriority.setText("");
         //mPoints.setText();
         //mOriginalsAbove.setText();
         //mCopiesAbove.setText();
@@ -300,9 +338,15 @@ public class ShowSpbuGmuDataFragment extends AbstractShowDataFragment implements
         if(index <= 0 || index > mStudents.size())
             throw new IllegalArgumentException("Unknown student index!");
 
+        final Element row = mStudents.get(index - 1);
+        final Elements columns = row.children();
+
         final Favorite toCreate = new Favorite(getArguments().getString(TITLE_KEY), getArguments().getString(URL_KEY));
         toCreate.setParentInstitution(SPB_GMU.ordinal());
-        toCreate.setName(extractNameForStudent(mStudents.get(index - 1)));
+        toCreate.setName(extractNameForStudent(row));
+        toCreate.setPriority(Integer.valueOf(columns.get(2).text()));
+        toCreate.setMaxBudgetCount(getArguments().getInt(MAX_BUDGET));
+        toCreate.setPoints(Integer.valueOf(columns.get(5).text()));
 
         return toCreate;
     }

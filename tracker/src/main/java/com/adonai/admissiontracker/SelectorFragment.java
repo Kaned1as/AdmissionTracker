@@ -216,12 +216,18 @@ public class SelectorFragment extends BaseFragment {
 
             switch (mSelectedInstitution) {
                 case SPBU: // SPBU
-
                     getFragmentManager()
                         .beginTransaction()
                             .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
                             .replace(R.id.container, ShowSpbuDataFragment.forFavorite(selectedFav))
                         .commit();
+                    break;
+                case SPB_GMU:
+                    getFragmentManager()
+                            .beginTransaction()
+                            .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
+                            .replace(R.id.container, ShowSpbuGmuDataFragment.forFavorite(selectedFav))
+                            .commit();
                     break;
             }
         }

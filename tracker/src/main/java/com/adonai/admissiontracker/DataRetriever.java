@@ -19,4 +19,6 @@ public interface DataRetriever {
 
     BaseFragment getFragment();
 
+    boolean canTrackTime();
+
 }
