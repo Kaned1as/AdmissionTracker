@@ -1,6 +1,5 @@
 package com.adonai.admissiontracker;
 
-import android.app.FragmentTransaction;
 import android.os.Bundle;
 import android.os.Message;
 import android.view.LayoutInflater;
@@ -349,14 +348,6 @@ public class ShowSpbuGmuDataFragment extends AbstractShowDataFragment implements
         toCreate.setPoints(Integer.valueOf(columns.get(5).text()));
 
         return toCreate;
-    }
-
-    private void returnToSelections() {
-        getFragmentManager()
-                .beginTransaction()
-                .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
-                .replace(R.id.container, new SelectorFragment())
-                .commit();
     }
 
     @Override

@@ -49,5 +49,9 @@ public abstract class AbstractShowDataFragment extends BaseFragment {
         throw new ParseException(getString(R.string.name_not_found), table.size());
     }
 
+    protected void returnToSelections() {
+        getFragmentManager().popBackStack();
+    }
+
     protected abstract String extractNameForStudent(Element row);
 }

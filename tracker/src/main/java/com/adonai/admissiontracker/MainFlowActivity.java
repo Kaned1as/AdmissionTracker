@@ -11,22 +11,16 @@ import android.preference.PreferenceManager;
 import android.view.Menu;
 import android.view.MenuItem;
 
-import com.adonai.admissiontracker.database.DatabaseFactory;
-
 
 public class MainFlowActivity extends Activity {
 
     private NetworkService mService;
-    private final Object mServiceWaiter = new Object();
 
     private Intent mServiceCaller;
     private final ServiceConnection mServiceConn = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
             mService = ((NetworkService.ServiceRetriever) service).getService();
-            synchronized (mServiceWaiter) {
-                mServiceWaiter.notifyAll();
-            }
         }
 
         @Override

@@ -39,10 +39,16 @@
     <string name="updates_present">Есть обновления страниц</string>
     <string name="but_excuse">Увы!</string>
     <string name="only_pro">Эта функция доступна только в про-версии</string>
-    <string name="click_ad">Покликать рекламу...</string>
+    <string name="click_ad">Покликать рекламу…</string>
     <string name="buy_pro">Купить про-версию</string>
     <string name="name_not_found">Имя не найдено в таблице!</string>
     <string name="invalid_url">Неверная ссылка</string>
     <string name="priority">Приоритет</string>
     <string name="better_than_me">Лучше меня:</string>
+    <string name="select_statistics">Выберите режим статистики</string>
+    <string name="originals_above">Оригиналов выше</string>
+    <string name="copies_above">Копий выше</string>
+    <string name="reclaimed_above">Забравших документы выше</string>
+    <string name="total_submitted">Всего подано</string>
+    <string name="reclaimed_today">Забрано документов сегодня</string>
 </resources>

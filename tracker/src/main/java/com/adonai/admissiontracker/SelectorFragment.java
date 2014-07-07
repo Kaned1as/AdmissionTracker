@@ -91,6 +91,7 @@ public class SelectorFragment extends BaseFragment {
         }
 
         // парсим документ
+        mSpinnersHolder.removeAllViews();
         switch (mSelectedInstitution) {
             case SPBU:
                 setLayoutSpbu(doc.select(".treeview > ul").first());
@@ -148,6 +149,7 @@ public class SelectorFragment extends BaseFragment {
                     public void onClick(View v) {
                         getFragmentManager()
                             .beginTransaction()
+                                .addToBackStack("ShowingSpbuDataFragment")
                                 .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
                                 .replace(R.id.container, ShowSpbuDataFragment.forPage(div.text(), SPBU.getUrl() + url))
                             .commit();
@@ -218,6 +220,7 @@ public class SelectorFragment extends BaseFragment {
                 case SPBU: // SPBU
                     getFragmentManager()
                         .beginTransaction()
+                            .addToBackStack("ShowingSpbuDataFragment")
                             .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
                             .replace(R.id.container, ShowSpbuDataFragment.forFavorite(selectedFav))
                         .commit();
@@ -225,6 +228,7 @@ public class SelectorFragment extends BaseFragment {
                 case SPB_GMU:
                     getFragmentManager()
                             .beginTransaction()
+                            .addToBackStack("ShowingSpbGmuDataFragment")
                             .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
                             .replace(R.id.container, ShowSpbuGmuDataFragment.forFavorite(selectedFav))
                             .commit();

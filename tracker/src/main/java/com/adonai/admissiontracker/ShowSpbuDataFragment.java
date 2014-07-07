@@ -1,6 +1,5 @@
 package com.adonai.admissiontracker;
 
-import android.app.FragmentTransaction;
 import android.os.Bundle;
 import android.os.Message;
 import android.view.LayoutInflater;
@@ -200,14 +199,6 @@ public class ShowSpbuDataFragment extends AbstractShowDataFragment implements Da
         mLastTimestamp.setText("");
         //mTotalReclaimed.setText();
         //mNeededPoints.setText();
-    }
-
-    private void returnToSelections() {
-        getFragmentManager()
-            .beginTransaction()
-                .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
-                .replace(R.id.container, new SelectorFragment())
-            .commit();
     }
 
     private StudentInfo retrieveStatistics(Favorite fav, Elements data) throws ParseException {

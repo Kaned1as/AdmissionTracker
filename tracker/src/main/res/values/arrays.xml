@@ -5,4 +5,13 @@
         <item>@string/spbu</item>
         <item>@string/spb_gmu</item>
     </string-array>
+
+    <string-array name="statistics_type_array">
+        <item>@string/originals_above</item>
+        <item>@string/copies_above</item>
+        <item>@string/reclaimed_above</item>
+        <item>@string/total_submitted</item>
+        <item>@string/reclaimed_today</item>
+        <item>@string/needed_points</item>
+    </string-array>
 </resources>
