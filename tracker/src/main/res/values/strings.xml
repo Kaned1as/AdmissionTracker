@@ -53,4 +53,5 @@
     <string name="reclaimed_today">Забрано документов сегодня</string>
     <string name="statistics_by_day">Статистика по дням</string>
     <string name="favorite_not_found">Не найдено в избранном!</string>
+    <string name="cannot_load_statistics">Не удалось загрузить статистику!</string>
 </resources>
