@@ -9,7 +9,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.CompoundButton;
+import android.widget.Button;
 import android.widget.Spinner;
 import android.widget.SpinnerAdapter;
 import android.widget.Toast;
@@ -44,7 +44,6 @@ public class ShowSpbuDataFragment extends AbstractShowDataFragment implements Da
 
     private Elements mStudents = null;
 
-    private Spinner mNameSelector;
     private ToggleButton mFavButton;
     private DoubleTextView mListNumber, mAdmissionDate, mPoints, mOriginalsAbove, mCopiesAbove, mReclaimedAbove;
     private DoubleTextView mLastTimestamp, mTotalReclaimed, mNeededPoints;
@@ -78,6 +77,9 @@ public class ShowSpbuDataFragment extends AbstractShowDataFragment implements Da
 
         mNameSelector = (Spinner) rootView.findViewById(R.id.name_spinner);
         mNameSelector.setOnItemSelectedListener(mNameSelectorListener);
+
+        mShowStatistics = (Button) rootView.findViewById(R.id.show_statistics_button);
+
         mFavButton = (ToggleButton) rootView.findViewById(R.id.favorite_button);
         mFavButton.setOnCheckedChangeListener(mFavClickListener);
 
@@ -132,7 +134,7 @@ public class ShowSpbuDataFragment extends AbstractShowDataFragment implements Da
                 final Element tableBody = ni.content.select("tbody").first();
                 if (tableBody == null) {
                     Toast.makeText(getActivity(), R.string.no_data_available, Toast.LENGTH_SHORT).show();
-                    returnToSelections();
+                    getFragmentManager().popBackStack();
                 } else if(mLastUpdated == 0 || mLastUpdated < ni.lastModified) {
                     mStudents = tableBody.children();
                     mLastUpdated = ni.lastModified;
@@ -248,6 +250,7 @@ public class ShowSpbuDataFragment extends AbstractShowDataFragment implements Da
         public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
             final Element row = (Element) parent.getAdapter().getItem(position);
             mFavButton.setVisibility(row != null ? View.VISIBLE : View.INVISIBLE);
+            mShowStatistics.setVisibility(row != null ? View.VISIBLE : View.INVISIBLE);
             if(row != null) {
                 // update grid
                 final Favorite toPersist = createFavForStudent(position);
@@ -284,33 +287,12 @@ public class ShowSpbuDataFragment extends AbstractShowDataFragment implements Da
         }
     }
 
-    private class FavoriteClickListener implements CompoundButton.OnCheckedChangeListener {
-
-        @Override
-        public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-            if(isChecked)
-                try {
-                    DatabaseFactory.getHelper().getFavoritesDao().createOrUpdate(createFavForStudent(mNameSelector.getSelectedItemPosition()));
-                    Toast.makeText(getActivity(), R.string.added_to_favs, Toast.LENGTH_SHORT).show();
-                } catch (SQLException e) {
-                    Toast.makeText(getActivity(), R.string.database_error, Toast.LENGTH_SHORT).show();
-                }
-            else
-                try {
-                    DatabaseFactory.getHelper().getFavoritesDao().delete(createFavForStudent(mNameSelector.getSelectedItemPosition()));
-                    Toast.makeText(getActivity(), R.string.removed_from_favs, Toast.LENGTH_SHORT).show();
-                } catch (SQLException e) {
-                    Toast.makeText(getActivity(), R.string.database_error, Toast.LENGTH_SHORT).show();
-                }
-        }
-    }
-
     /**
      * Creates favorite to store in DB for selected index
      * @param index index beginning from 1
      * @return favorite instance for selected student
      */
-    private Favorite createFavForStudent(int index) {
+    protected Favorite createFavForStudent(int index) {
         if(index <= 0 || index > mStudents.size())
             throw new IllegalArgumentException("Unknown student index!");
 

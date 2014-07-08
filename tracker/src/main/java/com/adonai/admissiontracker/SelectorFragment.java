@@ -117,10 +117,11 @@ public class SelectorFragment extends BaseFragment {
                     try {
                         final Integer budgetCount = Integer.valueOf(selectedLink.parent().nextElementSibling().nextElementSibling().text());
                         getFragmentManager()
-                                .beginTransaction()
+                            .beginTransaction()
+                                .addToBackStack("ShowingSpbGmuDataFragment")
                                 .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
                                 .replace(R.id.container, ShowSpbuGmuDataFragment.forPage(selectedLink.text(), new URL(new URL(SPB_GMU.getUrl()), selectedLink.attr("href")).toString(), budgetCount))
-                                .commit();
+                            .commit();
                     } catch (MalformedURLException e) {
                         Toast.makeText(getActivity(), R.string.invalid_url, Toast.LENGTH_SHORT).show();
                     } // should never happen
@@ -181,6 +182,10 @@ public class SelectorFragment extends BaseFragment {
         mSpinnersHolder.addView(levelSelector);
     }
 
+    public static SelectorFragment forFavorite(Favorite selected) {
+        return new SelectorFragment();
+    }
+
     private class InstitutionSelectorListener implements AdapterView.OnItemSelectedListener {
 
         @Override
@@ -227,11 +232,11 @@ public class SelectorFragment extends BaseFragment {
                     break;
                 case SPB_GMU:
                     getFragmentManager()
-                            .beginTransaction()
+                        .beginTransaction()
                             .addToBackStack("ShowingSpbGmuDataFragment")
                             .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
                             .replace(R.id.container, ShowSpbuGmuDataFragment.forFavorite(selectedFav))
-                            .commit();
+                        .commit();
                     break;
             }
         }

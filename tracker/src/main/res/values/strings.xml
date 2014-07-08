@@ -51,4 +51,6 @@
     <string name="reclaimed_above">Забравших документы выше</string>
     <string name="total_submitted">Всего подано</string>
     <string name="reclaimed_today">Забрано документов сегодня</string>
+    <string name="statistics_by_day">Статистика по дням</string>
+    <string name="favorite_not_found">Не найдено в избранном!</string>
 </resources>

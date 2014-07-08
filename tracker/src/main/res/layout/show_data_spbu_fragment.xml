@@ -153,6 +153,17 @@
                 app:header_text="@string/needed_points"
                 android:layout_margin="5dp" />
         </LinearLayout>
+
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/statistics_by_day"
+            android:id="@+id/show_statistics_button"
+            android:layout_columnSpan="3"
+            android:background="@drawable/btn_statistics"
+            android:layout_margin="5dp"
+            android:visibility="invisible" />
+
     </GridLayout>
 
 </RelativeLayout>
