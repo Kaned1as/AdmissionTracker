@@ -7,6 +7,7 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 
+import com.adonai.admissiontracker.entities.Favorite;
 import com.jjoe64.graphview.LineGraphView;
 
 /**
@@ -16,6 +17,10 @@ public class StatisticsFragment extends BaseFragment {
 
     private LineGraphView mLineGraph;
     private Spinner mStatisticsSpinner;
+
+    public static StatisticsFragment forFavorite(Favorite selected) {
+        return new StatisticsFragment();
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {

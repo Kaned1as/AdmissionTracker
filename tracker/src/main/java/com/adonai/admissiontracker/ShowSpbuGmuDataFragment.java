@@ -51,6 +51,7 @@ public class ShowSpbuGmuDataFragment extends AbstractShowDataFragment implements
 
     private NameSelectorListener mNameSelectorListener = new NameSelectorListener();
     private FavoriteClickListener mFavClickListener = new FavoriteClickListener();
+    private ShowStatisticsClickListener mStatClickListener = new ShowStatisticsClickListener();
 
     public static ShowSpbuGmuDataFragment forFavorite(Favorite data) {
         final ShowSpbuGmuDataFragment result = new ShowSpbuGmuDataFragment();
@@ -82,6 +83,7 @@ public class ShowSpbuGmuDataFragment extends AbstractShowDataFragment implements
         mNameSelector.setOnItemSelectedListener(mNameSelectorListener);
 
         mShowStatistics = (Button) rootView.findViewById(R.id.show_statistics_button);
+        mShowStatistics.setOnClickListener(mStatClickListener);
 
         mFavButton = (ToggleButton) rootView.findViewById(R.id.favorite_button);
         mFavButton.setOnCheckedChangeListener(mFavClickListener);

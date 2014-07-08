@@ -182,10 +182,6 @@ public class SelectorFragment extends BaseFragment {
         mSpinnersHolder.addView(levelSelector);
     }
 
-    public static SelectorFragment forFavorite(Favorite selected) {
-        return new SelectorFragment();
-    }
-
     private class InstitutionSelectorListener implements AdapterView.OnItemSelectedListener {
 
         @Override

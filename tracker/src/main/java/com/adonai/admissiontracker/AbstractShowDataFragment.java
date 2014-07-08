@@ -97,8 +97,10 @@ public abstract class AbstractShowDataFragment extends BaseFragment {
                 getFragmentManager()
                     .beginTransaction()
                         .addToBackStack("ShowingStatisticsFragment")
-                        .setTransition(FragmentTransaction.TRANSIT_ENTER_MASK)
-                        .replace(R.id.container, SelectorFragment.forFavorite(selected))
+                        .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
+                        .hide(AbstractShowDataFragment.this)
+                        .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
+                        .add(R.id.container, StatisticsFragment.forFavorite(selected))
                     .commit();
             } catch (SQLException e) {
                 Toast.makeText(getActivity(), R.string.favorite_not_found, Toast.LENGTH_SHORT).show();

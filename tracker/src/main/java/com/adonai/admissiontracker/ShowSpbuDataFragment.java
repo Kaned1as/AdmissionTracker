@@ -50,6 +50,7 @@ public class ShowSpbuDataFragment extends AbstractShowDataFragment implements Da
 
     private NameSelectorListener mNameSelectorListener = new NameSelectorListener();
     private FavoriteClickListener mFavClickListener = new FavoriteClickListener();
+    private ShowStatisticsClickListener mStatClickListener = new ShowStatisticsClickListener();
 
     public static ShowSpbuDataFragment forFavorite(Favorite data) {
         final ShowSpbuDataFragment result = new ShowSpbuDataFragment();
@@ -79,6 +80,7 @@ public class ShowSpbuDataFragment extends AbstractShowDataFragment implements Da
         mNameSelector.setOnItemSelectedListener(mNameSelectorListener);
 
         mShowStatistics = (Button) rootView.findViewById(R.id.show_statistics_button);
+        mShowStatistics.setOnClickListener(mStatClickListener);
 
         mFavButton = (ToggleButton) rootView.findViewById(R.id.favorite_button);
         mFavButton.setOnCheckedChangeListener(mFavClickListener);
