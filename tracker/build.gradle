@@ -30,14 +30,16 @@ android {
         release {
             debuggable false
             signingConfig signingConfigs.release
-            runProguard false
+            runProguard true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
 
         pro {
+            applicationIdSuffix ".pro"
             debuggable false
             signingConfig signingConfigs.release
-            applicationIdSuffix ".pro"
+            runProguard true
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
 
