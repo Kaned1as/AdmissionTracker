@@ -192,6 +192,7 @@ public class ShowSpbuGmuDataFragment extends AbstractShowDataFragment implements
         public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
             final Element row = (Element) parent.getAdapter().getItem(position);
             mFavButton.setVisibility(row != null ? View.VISIBLE : View.INVISIBLE);
+            mShowStatistics.setVisibility(row != null ? View.VISIBLE : View.INVISIBLE);
             if(row != null) {
                 // update grid
                 final Favorite toPersist = createFavForStudent(position);
