@@ -54,4 +54,5 @@
     <string name="statistics_by_day">Статистика по дням</string>
     <string name="favorite_not_found">Не найдено в избранном!</string>
     <string name="cannot_load_statistics">Не удалось загрузить статистику!</string>
+    <string name="statistics_not_collected">Статистика ещё не собрана! Отследите хотя бы несколько часов!</string>
 </resources>

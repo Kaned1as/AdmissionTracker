@@ -75,9 +75,12 @@ public class StatisticsFragment extends BaseFragment {
 
         try {
             final String favoriteId = getArguments().getString(FAV_KEY);
-            //final Favorite curFav = DatabaseFactory.getHelper().getFavoritesDao().queryForId(favoriteId);
             final QueryBuilder<Statistics, Integer> qb = DatabaseFactory.getHelper().getStatDao().queryBuilder();
             mStatistics = qb.where().eq("parent_id", favoriteId).query();
+            if(mStatistics.isEmpty()) {
+                Toast.makeText(getActivity(), R.string.statistics_not_collected, Toast.LENGTH_SHORT).show();
+                getFragmentManager().popBackStack();
+            }
 
         } catch (SQLException e) {
             e.printStackTrace();
@@ -93,6 +96,9 @@ public class StatisticsFragment extends BaseFragment {
         @Override
         public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
             mLineGraph.removeAllSeries();
+
+            if(mStatistics.isEmpty()) // нет статистики, делать нечего
+                return;
 
             final GraphView.GraphViewData[] data = new GraphView.GraphViewData[mStatistics.size()];
             for(int i = 0; i < mStatistics.size(); ++i) {
@@ -126,8 +132,8 @@ public class StatisticsFragment extends BaseFragment {
             }
             final GraphViewSeries series = new GraphViewSeries(parent.getItemAtPosition(position).toString(), new GraphViewSeriesStyle(Color.rgb(90, 250, 00), 5), data);
             mLineGraph.addSeries(series);
-            final Statistics firstStat = mStatistics.get(0);
-            final Statistics lastStat = mStatistics.get(mStatistics.size() - 1);
+            //final Statistics firstStat = mStatistics.get(0);
+            //final Statistics lastStat = mStatistics.get(mStatistics.size() - 1);
             //mLineGraph.setViewPort(firstStat.getTimestamp().getTime(), lastStat.getTimestamp().getTime());
             mLineGraph.setScalable(true);
         }
