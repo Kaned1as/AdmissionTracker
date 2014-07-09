@@ -30,6 +30,7 @@
         </service>
 
         <meta-data android:name="com.mobclix.APPLICATION_ID" android:value="A54B3B40-7546-44C0-A91A-78976556D9F9"/>
+        <meta-data android:name="com.google.android.gms.version" android:value="@integer/google_play_services_version" />
     </application>
 
 </manifest>
