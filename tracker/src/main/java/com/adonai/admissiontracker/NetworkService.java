@@ -100,8 +100,14 @@ public class NetworkService extends Service implements Handler.Callback, SharedP
                 }
                 break;
             case Constants.UPDATE_FAVS:
+                mNetworkHandler.sendEmptyMessageDelayed(Constants.UPDATE_FAVS, UPDATE_INTERVAL);
+                if(!getPackageName().endsWith(".pro")) { // это обычное приложение, сбрасываем статус
+                    long lastClicked = mPreferences.getLong(PREF_CLICKTIME, 0l);
+                    if(System.currentTimeMillis() > lastClicked + DROP_MARK_INTERVAL)
+                        mPreferences.edit().putBoolean(PREF_AUTOUPDATE, false).apply();
+                }
+
                 try {
-                    mNetworkHandler.sendEmptyMessageDelayed(Constants.UPDATE_FAVS, UPDATE_INTERVAL);
                     final List<Favorite> storedFavs = DatabaseFactory.getHelper().getFavoritesDao().queryForAll();
                     for(final Favorite curFav : storedFavs) {
                         final String pageData = mClient.getPageAndContextAsString(curFav.getUrl());
@@ -122,12 +128,6 @@ public class NetworkService extends Service implements Handler.Callback, SharedP
                                 nm.notify(NEWS_NOTIFICATION_ID, toShow); // запускаем уведомление
                             }
                         }
-                    }
-
-                    if(!getPackageName().endsWith(".pro")) { // это обычное приложение, сбрасываем статус
-                        long lastClicked = mPreferences.getLong(PREF_CLICKTIME, 0l);
-                        if(System.currentTimeMillis() > lastClicked + DROP_MARK_INTERVAL)
-                            mPreferences.edit().putBoolean(PREF_AUTOUPDATE, false).apply();
                     }
                 } catch (Exception ignored) {
                     //throw new RuntimeException(ignored);

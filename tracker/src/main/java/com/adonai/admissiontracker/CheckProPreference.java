@@ -50,7 +50,7 @@ public class CheckProPreference extends CheckBoxPreference {
                     builder.setTitle(R.string.but_excuse);
                     builder.setMessage(R.string.only_pro);
                     //builder.setPositiveButton(R.string.click_ad, new MobClixOnClickListener());
-                    //builder.setPositiveButton(R.string.click_ad, new MobClixOnClickListener());
+                    builder.setPositiveButton(R.string.click_ad, new AdMobOnClickListener());
                     builder.setNeutralButton(R.string.buy_pro, new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
@@ -66,7 +66,7 @@ public class CheckProPreference extends CheckBoxPreference {
         });
     }
 
-    private class MobClixOnClickListener implements DialogInterface.OnClickListener {
+    private class AdMobOnClickListener implements DialogInterface.OnClickListener {
 
         @Override
         public void onClick(DialogInterface dialog, int which) {
@@ -74,27 +74,30 @@ public class CheckProPreference extends CheckBoxPreference {
             final AdView adView = new AdView(getContext());
             adView.setAdUnitId("ca-app-pub-2426537600463724/5449840696");
             adView.setAdSize(AdSize.MEDIUM_RECTANGLE);
-            AdRequest adRequest = new AdRequest.Builder().build();
+            //AdRequest adRequest = new AdRequest.Builder().build();
+            AdRequest adRequest = new AdRequest.Builder()
+                    .addTestDevice(AdRequest.DEVICE_ID_EMULATOR)       // Эмулятор
+                    //.addTestDevice("5F6649872FDD765392DAE7F87BA66B10") // Тестовый телефон Galaxy Nexus
+                    .build();
             adView.loadAd(adRequest);
             adBuilder.setView(adView);
 
-            /*AdRequest adRequest = new AdRequest.Builder()
-                .addTestDevice(AdRequest.DEVICE_ID_EMULATOR)       // Эмулятор
-                .addTestDevice("AC98C820A50B4AD8A2106EDE96FB87D4") // Тестовый телефон Galaxy Nexus
-                .build();*/
-
             final Dialog advertiseDialog = adBuilder.create();
-            adView.pause();
             adView.setAdListener(new AdListener() {
                 @Override
                 public void onAdClosed() {
                     if (!CheckProPreference.this.isChecked())
                         CheckProPreference.super.onClick();
+                    adView.destroy();
                     advertiseDialog.dismiss();
                 }
 
             });
             advertiseDialog.show();
+
+            //int ht_px = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 375, getContext().getResources().getDisplayMetrics());
+            //int wt_px = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 450, getContext().getResources().getDisplayMetrics());
+            //advertiseDialog.getWindow().setLayout(wt_px, ht_px);
         }
     }
 
