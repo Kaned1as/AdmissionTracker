@@ -5,6 +5,7 @@
     <string name="select_institution">Выберите ВУЗ</string>
     <string name="spbu">СПбГУ</string>
     <string name="spb_gmu">СПб ГМУ</string>
+    <string name="itmo">ИТМО</string>
     <string name="network_error">Ошибка сети</string>
     <string name="wait_please">Пожалуйста, подождите…</string>
     <string name="retrieving_data">Загрузка данных…</string>

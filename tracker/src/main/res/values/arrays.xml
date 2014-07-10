@@ -4,6 +4,7 @@
         <item>@string/select_institution</item>
         <item>@string/spbu</item>
         <item>@string/spb_gmu</item>
+        <item>@string/itmo</item>
     </string-array>
 
     <string-array name="statistics_type_array">
