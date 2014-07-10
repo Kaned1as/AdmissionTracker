@@ -114,7 +114,7 @@ public abstract class AbstractShowDataFragment extends BaseFragment implements D
     public boolean isUpdate(Statistics newStat) {
         try {
             final QueryBuilder<Statistics, Integer> qb = DatabaseFactory.getHelper().getStatDao().queryBuilder();
-            final Statistics last = qb.orderBy("timestamp", false).queryForFirst();
+            final Statistics last = qb.orderBy("timestamp", false).where().eq("parent_id", newStat.getParent()).queryForFirst();
             return last != null && !newStat.contentEquals(last);
         } catch (SQLException e) {
             e.printStackTrace();
