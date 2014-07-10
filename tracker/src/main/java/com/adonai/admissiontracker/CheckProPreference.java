@@ -86,8 +86,12 @@ public class CheckProPreference extends CheckBoxPreference {
             adView.setAdListener(new AdListener() {
                 @Override
                 public void onAdClosed() {
-                    if (!CheckProPreference.this.isChecked())
+                    if (!CheckProPreference.this.isChecked()) {
                         CheckProPreference.super.onClick();
+
+                        // extend clicktime for a day
+                        getEditor().putLong(NetworkService.PREF_CLICKTIME, System.currentTimeMillis()).apply();
+                    }
                     adView.destroy();
                     advertiseDialog.dismiss();
                 }
