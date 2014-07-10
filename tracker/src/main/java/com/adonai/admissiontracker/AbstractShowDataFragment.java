@@ -49,7 +49,7 @@ public abstract class AbstractShowDataFragment extends BaseFragment implements D
                 view = convertView;
 
             text = (TextView) view.findViewById(android.R.id.text1);
-            text.setText(row == null ? getContext().getString(R.string.select_from_list) : extractNameForStudent(row));
+            text.setText(row == null ? getContext().getString(R.string.select_from_list) : position + ". " + extractNameForStudent(row));
 
             return view;
         }

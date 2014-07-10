@@ -5,7 +5,7 @@
         android:key="auto.update.key"
         android:title="@string/notify_updates"
         android:summary="@string/notify_updates_sum"
-        android:defaultValue="false" />
+        android:defaultValue="true" />
 
     <ListPreference
         android:key="auto.update.interval"
