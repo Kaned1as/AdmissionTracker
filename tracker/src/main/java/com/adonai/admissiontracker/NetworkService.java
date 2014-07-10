@@ -28,9 +28,10 @@ import java.util.List;
 public class NetworkService extends Service implements Handler.Callback, SharedPreferences.OnSharedPreferenceChangeListener {
 
     public final static String PREF_AUTOUPDATE = "auto.update.key";
+    public final static String PREF_AUTOUPDATE_INTERVAL = "auto.update.interval";
     public final static String PREF_CLICKTIME = "last.click.time";
 
-    private final static long UPDATE_INTERVAL = 300000; // 5 минут
+    private final static String DEFAULT_UPDATE_INTERVAL = "5";
     private final static long DROP_MARK_INTERVAL = 86400000; // 1 день
 
     private static final int NEWS_NOTIFICATION_ID = 17002;
@@ -40,6 +41,7 @@ public class NetworkService extends Service implements Handler.Callback, SharedP
     private SharedPreferences mPreferences;
 
     private boolean isPeriodicCheckEnabled;
+    private long updateTime = 5 * 60 * 1000;
 
     public class ServiceRetriever extends Binder {
 
@@ -69,8 +71,10 @@ public class NetworkService extends Service implements Handler.Callback, SharedP
         mNetworkHandler = new Handler(thr.getLooper(), this);
 
         isPeriodicCheckEnabled = mPreferences.getBoolean(PREF_AUTOUPDATE, false);
-        if(isPeriodicCheckEnabled)
-            mNetworkHandler.sendEmptyMessageDelayed(Constants.UPDATE_FAVS, UPDATE_INTERVAL);
+        if(isPeriodicCheckEnabled) {
+            updateTime = Long.valueOf(mPreferences.getString(PREF_AUTOUPDATE_INTERVAL, DEFAULT_UPDATE_INTERVAL)); // to millis
+            mNetworkHandler.sendEmptyMessageDelayed(Constants.UPDATE_FAVS, updateTime);
+        }
     }
 
     @Override
@@ -100,7 +104,7 @@ public class NetworkService extends Service implements Handler.Callback, SharedP
                 }
                 break;
             case Constants.UPDATE_FAVS:
-                mNetworkHandler.sendEmptyMessageDelayed(Constants.UPDATE_FAVS, UPDATE_INTERVAL);
+                mNetworkHandler.sendEmptyMessageDelayed(Constants.UPDATE_FAVS, updateTime);
                 if(!getPackageName().endsWith(".pro")) { // это обычное приложение, сбрасываем статус
                     long lastClicked = mPreferences.getLong(PREF_CLICKTIME, 0l);
                     if(System.currentTimeMillis() > lastClicked + DROP_MARK_INTERVAL)
@@ -123,8 +127,8 @@ public class NetworkService extends Service implements Handler.Callback, SharedP
                         if (qb.queryForFirst() == null) { // we haven't this row in DB
                             DatabaseFactory.getHelper().getStatDao().create(stats); // сохраняем текущую статистику в БД
 
-                            if(statRetriever.canTrackTime()) {
-                                final Notification toShow = createNotification(Constants.VIEW_FORMAT.format(stats.getTimestamp()));
+                            if(statRetriever.isUpdate(stats)) {
+                                final Notification toShow = createNotification(Constants.VIEW_FORMAT.format(stats.getTimestamp()), stats.getParent().getTitle());
                                 nm.notify(NEWS_NOTIFICATION_ID, toShow); // запускаем уведомление
                             }
                         }
@@ -144,10 +148,12 @@ public class NetworkService extends Service implements Handler.Callback, SharedP
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
         switch (key) {
             case PREF_AUTOUPDATE:
+            case PREF_AUTOUPDATE_INTERVAL:
                 mNetworkHandler.removeMessages(Constants.UPDATE_FAVS);
-                isPeriodicCheckEnabled = sharedPreferences.getBoolean(key, false);
+                isPeriodicCheckEnabled = sharedPreferences.getBoolean(PREF_AUTOUPDATE, false);
+                updateTime = Long.valueOf(sharedPreferences.getString(PREF_AUTOUPDATE_INTERVAL, DEFAULT_UPDATE_INTERVAL)); // to millis
                 if(isPeriodicCheckEnabled)
-                    mNetworkHandler.sendEmptyMessageDelayed(Constants.UPDATE_FAVS, UPDATE_INTERVAL);
+                    mNetworkHandler.sendEmptyMessageDelayed(Constants.UPDATE_FAVS, updateTime);
                 break;
         }
     }
@@ -168,7 +174,7 @@ public class NetworkService extends Service implements Handler.Callback, SharedP
 
     // Создаем уведомление в статусной строке - для принудительно живого сервиса в Foreground-режиме
     @SuppressWarnings("deprecation") // we need min 14 API, not 16
-    private Notification createNotification(String title)
+    private Notification createNotification(String date, String text)
     {
         final Intent intent = new Intent(this, MainFlowActivity.class); // при клике на уведомление открываем приложение
         intent.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
@@ -176,7 +182,7 @@ public class NetworkService extends Service implements Handler.Callback, SharedP
         final Notification.Builder builder = new Notification.Builder(this)
                 .setSmallIcon(R.drawable.ic_launcher_notification)
                 .setContentTitle(getString(R.string.updates_present))
-                .setContentText(title)
+                .setContentText(date + ": " + text)
                 .setAutoCancel(true)
                 .setContentIntent(PendingIntent.getActivity(this, 0, intent, 0));
 

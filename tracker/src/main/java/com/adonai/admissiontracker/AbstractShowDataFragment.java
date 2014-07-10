@@ -13,6 +13,8 @@ import android.widget.Toast;
 
 import com.adonai.admissiontracker.database.DatabaseFactory;
 import com.adonai.admissiontracker.entities.Favorite;
+import com.adonai.admissiontracker.entities.Statistics;
+import com.j256.ormlite.stmt.QueryBuilder;
 
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
@@ -23,7 +25,7 @@ import java.text.ParseException;
 /**
  * Created by adonai on 05.07.14.
  */
-public abstract class AbstractShowDataFragment extends BaseFragment {
+public abstract class AbstractShowDataFragment extends BaseFragment implements DataRetriever {
 
     protected Button mShowStatistics;
     protected Spinner mNameSelector;
@@ -76,14 +78,6 @@ public abstract class AbstractShowDataFragment extends BaseFragment {
         }
     }
 
-    protected Element findRowWithName(Elements table, String name) throws ParseException {
-        for(Element row : table)
-            if(extractNameForStudent(row).equals(name))
-                return row;
-
-        throw new ParseException(getString(R.string.name_not_found), table.size());
-    }
-
     protected class ShowStatisticsClickListener implements View.OnClickListener {
 
         @Override
@@ -95,16 +89,36 @@ public abstract class AbstractShowDataFragment extends BaseFragment {
                     throw new SQLException("Not found!");
 
                 getFragmentManager()
-                    .beginTransaction()
+                        .beginTransaction()
                         .addToBackStack("ShowingStatisticsFragment")
                         .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
                         .hide(AbstractShowDataFragment.this)
                         .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
                         .add(R.id.container, StatisticsFragment.forFavorite(selected))
-                    .commit();
+                        .commit();
             } catch (SQLException e) {
                 Toast.makeText(getActivity(), R.string.favorite_not_found, Toast.LENGTH_SHORT).show();
             }
+        }
+    }
+
+    protected Element findRowWithName(Elements table, String name) throws ParseException {
+        for(Element row : table)
+            if(extractNameForStudent(row).equals(name))
+                return row;
+
+        throw new ParseException(getString(R.string.name_not_found), table.size());
+    }
+
+    @Override
+    public boolean isUpdate(Statistics newStat) {
+        try {
+            final QueryBuilder<Statistics, Integer> qb = DatabaseFactory.getHelper().getStatDao().queryBuilder();
+            final Statistics last = qb.orderBy("timestamp", false).queryForFirst();
+            return last != null && !newStat.contentEquals(last);
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
         }
     }
 

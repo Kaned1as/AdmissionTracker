@@ -6,4 +6,14 @@
         android:title="@string/notify_updates"
         android:summary="@string/notify_updates_sum"
         android:defaultValue="false" />
+
+    <ListPreference
+        android:key="auto.update.interval"
+        android:dependency="auto.update.key"
+        android:title="@string/autoupdate_interval"
+        android:summary="@string/autoupdate_interval_sum"
+        android:entries="@array/update_intervals_titles"
+        android:entryValues="@array/update_intervals_values"
+        android:defaultValue="5" />
+
 </PreferenceScreen>

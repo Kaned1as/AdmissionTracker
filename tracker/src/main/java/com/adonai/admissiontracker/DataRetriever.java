@@ -19,6 +19,6 @@ public interface DataRetriever {
 
     BaseFragment getFragment();
 
-    boolean canTrackTime();
+    boolean isUpdate(Statistics newStat);
 
 }

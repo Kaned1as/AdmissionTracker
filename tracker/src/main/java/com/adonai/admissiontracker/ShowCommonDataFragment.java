@@ -34,7 +34,7 @@ import java.util.Queue;
 /**
  * Created by adonai on 05.07.14.
  */
-public class ShowCommonDataFragment extends AbstractShowDataFragment implements DataRetriever {
+public class ShowCommonDataFragment extends AbstractShowDataFragment {
 
     private static final String TITLE_KEY = "page.title";               // MANDATORY
     private static final String INST_KEY = "parent.institution";        // MANDATORY
@@ -170,21 +170,16 @@ public class ShowCommonDataFragment extends AbstractShowDataFragment implements 
 
     @Override
     public StudentInfo retrieveStatistics(Favorite fav, NetworkService.NetworkInfo data) throws Exception {
-        final Element tableBody = data.content.select("tbody").first();
-        if (tableBody == null)
+        final Elements tableBody = data.content.select("tr:has(td:matches(\\d+))");
+        if (tableBody.isEmpty())
             return null;
 
-        return retrieveStatistics(fav, tableBody.children());
+        return retrieveStatistics(fav, tableBody);
     }
 
     @Override
     public BaseFragment getFragment() {
         return this;
-    }
-
-    @Override
-    public boolean canTrackTime() {
-        return false;
     }
 
     private class NameSelectorListener implements AdapterView.OnItemSelectedListener {

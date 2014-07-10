@@ -77,7 +77,7 @@ public class CheckProPreference extends CheckBoxPreference {
             //AdRequest adRequest = new AdRequest.Builder().build();
             AdRequest adRequest = new AdRequest.Builder()
                     .addTestDevice(AdRequest.DEVICE_ID_EMULATOR)       // Эмулятор
-                    //.addTestDevice("5F6649872FDD765392DAE7F87BA66B10") // Тестовый телефон Galaxy Nexus
+                    .addTestDevice("5F6649872FDD765392DAE7F87BA66B10") // Тестовый телефон Galaxy Nexus
                     .build();
             adView.loadAd(adRequest);
             adBuilder.setView(adView);

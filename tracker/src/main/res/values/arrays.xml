@@ -15,4 +15,20 @@
         <item>@string/reclaimed_today</item>
         <item>@string/needed_points</item>
     </string-array>
+
+    <string-array name="update_intervals_titles">
+        <item>Каждые 5 минут</item>
+        <item>Каждые 30 минут</item>
+        <item>Каждый час</item>
+        <item>Каждые полдня</item>
+        <item>Каждый день</item>
+    </string-array>
+
+    <string-array name="update_intervals_values">
+        <item>300000</item>
+        <item>1800000</item>
+        <item>3600000</item>
+        <item>21600000</item>
+        <item>43200000</item>
+    </string-array>
 </resources>

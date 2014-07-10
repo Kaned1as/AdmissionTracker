@@ -113,4 +113,26 @@ public class Statistics {
     public void setCopiesAbove(Integer copiesAbove) {
         this.copiesAbove = copiesAbove;
     }
+
+    public boolean contentEquals(Statistics that) {
+        if (this == that)
+            return true;
+        if (that == null)
+            return false;
+
+        if (copiesAbove != null ? !copiesAbove.equals(that.copiesAbove) : that.copiesAbove != null)
+            return false;
+        if (neededPoints != null ? !neededPoints.equals(that.neededPoints) : that.neededPoints != null)
+            return false;
+        if (originalsAbove != null ? !originalsAbove.equals(that.originalsAbove) : that.originalsAbove != null)
+            return false;
+        if (reclaimedAbove != null ? !reclaimedAbove.equals(that.reclaimedAbove) : that.reclaimedAbove != null)
+            return false;
+        if (reclaimedToday != null ? !reclaimedToday.equals(that.reclaimedToday) : that.reclaimedToday != null)
+            return false;
+        if (totalSubmitted != null ? !totalSubmitted.equals(that.totalSubmitted) : that.totalSubmitted != null)
+            return false;
+
+        return true;
+    }
 }

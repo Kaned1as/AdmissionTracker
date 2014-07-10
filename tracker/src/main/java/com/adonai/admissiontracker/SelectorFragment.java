@@ -49,7 +49,7 @@ public class SelectorFragment extends BaseFragment {
 
         mInstSelector = (Spinner) rootView.findViewById(R.id.institution_spinner);
         mInstSelector.setAdapter(new ArrayAdapter<>(getActivity(), R.layout.tall_list_item, getResources().getStringArray(R.array.institutions_array)));
-        mInstSelector.setSelection(1); // Пока у нас всего один институт
+        //mInstSelector.setSelection(1);
         mInstSelector.setOnItemSelectedListener(mInstSelectListener);
 
         mFavSelector = (Spinner) rootView.findViewById(R.id.favorites_spinner);
@@ -177,6 +177,7 @@ public class SelectorFragment extends BaseFragment {
             mSelectedInstitution = Constants.University.values()[position];
             switch (mSelectedInstitution) {
                 case NONE: // nothing selected
+                    break;
                 default:
                     mProgressDialog.show();
                     getMainActivity().getService().retrievePage(mSelectedInstitution.getUrl(), mHandler);

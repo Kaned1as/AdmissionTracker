@@ -34,7 +34,7 @@ import static com.adonai.admissiontracker.Constants.University.SPBU;
 /**
  * Created by adonai on 27.06.14.
  */
-public class ShowSpbuDataFragment extends AbstractShowDataFragment implements DataRetriever {
+public class ShowSpbuDataFragment extends AbstractShowDataFragment {
 
     private static final String TITLE_KEY = "page.title";       // MANDATORY
     private static final String URL_KEY = "page.url";           // MANDATORY
@@ -239,11 +239,6 @@ public class ShowSpbuDataFragment extends AbstractShowDataFragment implements Da
     @Override
     public BaseFragment getFragment() {
         return this;
-    }
-
-    @Override
-    public boolean canTrackTime() {
-        return true;
     }
 
     private class NameSelectorListener implements AdapterView.OnItemSelectedListener {
