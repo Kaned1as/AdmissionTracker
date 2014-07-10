@@ -10,10 +10,10 @@ public class DataRetrieverFactory {
             case SPBU:
                 return new ShowSpbuDataFragment();
             case SPB_GMU:
-                return new ShowSpbuGmuDataFragment();
+            case ITMO:
+                return new ShowCommonDataFragment();
             default:
                 return null;
         }
     }
-
 }

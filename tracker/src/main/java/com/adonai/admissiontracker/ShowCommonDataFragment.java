@@ -31,15 +31,14 @@ import java.util.Date;
 import java.util.PriorityQueue;
 import java.util.Queue;
 
-import static com.adonai.admissiontracker.Constants.University.SPB_GMU;
-
 /**
  * Created by adonai on 05.07.14.
  */
-public class ShowSpbuGmuDataFragment extends AbstractShowDataFragment implements DataRetriever {
+public class ShowCommonDataFragment extends AbstractShowDataFragment implements DataRetriever {
 
-    private static final String TITLE_KEY = "page.title";       // MANDATORY
-    private static final String URL_KEY = "page.url";           // MANDATORY
+    private static final String TITLE_KEY = "page.title";               // MANDATORY
+    private static final String INST_KEY = "parent.institution";        // MANDATORY
+    private static final String URL_KEY = "page.url";                   // MANDATORY
     private static final String NAME_KEY = "favorite.name";
     private static final String MAX_BUDGET = "max.budget.number";
 
@@ -53,23 +52,26 @@ public class ShowSpbuGmuDataFragment extends AbstractShowDataFragment implements
     private FavoriteClickListener mFavClickListener = new FavoriteClickListener();
     private ShowStatisticsClickListener mStatClickListener = new ShowStatisticsClickListener();
 
-    public static ShowSpbuGmuDataFragment forFavorite(Favorite data) {
-        final ShowSpbuGmuDataFragment result = new ShowSpbuGmuDataFragment();
+    public static ShowCommonDataFragment forFavorite(Favorite data) {
+        final ShowCommonDataFragment result = new ShowCommonDataFragment();
         final Bundle args = new Bundle();
+        args.putInt(INST_KEY, data.getParentInstitution());
         args.putString(TITLE_KEY, data.getTitleRaw());
         args.putString(URL_KEY, data.getUrl());
+
         args.putInt(MAX_BUDGET, data.getMaxBudgetCount());
         args.putString(NAME_KEY, data.getName());
         result.setArguments(args);
         return result;
     }
 
-    public static ShowSpbuGmuDataFragment forPage(String title, String url, int maxCount) {
-        final ShowSpbuGmuDataFragment result = new ShowSpbuGmuDataFragment();
+    public static ShowCommonDataFragment forPage(Constants.University parent, String title, String url, int maxBudget) {
+        final ShowCommonDataFragment result = new ShowCommonDataFragment();
         final Bundle args = new Bundle();
+        args.putInt(INST_KEY, parent.ordinal());
         args.putString(TITLE_KEY, title);
         args.putString(URL_KEY, url);
-        args.putInt(MAX_BUDGET, maxCount);
+        args.putInt(MAX_BUDGET, maxBudget);
         result.setArguments(args);
         return result;
     }
@@ -77,7 +79,7 @@ public class ShowSpbuGmuDataFragment extends AbstractShowDataFragment implements
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         setHasOptionsMenu(true);
-        final View rootView = inflater.inflate(R.layout.show_data_spb_gmu_fragment, container, false);
+        final View rootView = inflater.inflate(R.layout.show_data_common_fragment, container, false);
 
         mNameSelector = (Spinner) rootView.findViewById(R.id.name_spinner);
         mNameSelector.setOnItemSelectedListener(mNameSelectorListener);
@@ -119,12 +121,11 @@ public class ShowSpbuGmuDataFragment extends AbstractShowDataFragment implements
             case Constants.GET_URL: // got our URL back
                 final NetworkService.NetworkInfo ni = (NetworkService.NetworkInfo) msg.obj;
 
-                final Element tableBody = ni.content.select("tbody").first();
-                if (tableBody == null) {
+                mStudents = ni.content.select("tr:has(td:matches(\\d+))");
+                if (mStudents.size() == 0) {
                     Toast.makeText(getActivity(), R.string.no_data_available, Toast.LENGTH_SHORT).show();
                     getFragmentManager().popBackStack();
                 } else  {
-                    mStudents = tableBody.children();
                     updateNames();
                     try {
                         if(getArguments().containsKey(NAME_KEY)) { // it's favorite from DB
@@ -325,7 +326,7 @@ public class ShowSpbuGmuDataFragment extends AbstractShowDataFragment implements
         final Elements columns = row.children();
 
         final Favorite toCreate = new Favorite(getArguments().getString(TITLE_KEY), getArguments().getString(URL_KEY));
-        toCreate.setParentInstitution(SPB_GMU.ordinal());
+        toCreate.setParentInstitution(getArguments().getInt(INST_KEY));
         toCreate.setName(extractNameForStudent(row));
         toCreate.setPriority(Integer.valueOf(columns.get(2).text()));
         toCreate.setMaxBudgetCount(getArguments().getInt(MAX_BUDGET));

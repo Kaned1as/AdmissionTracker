@@ -28,7 +28,6 @@ import java.util.List;
 
 import static com.adonai.admissiontracker.Constants.University.NONE;
 import static com.adonai.admissiontracker.Constants.University.SPBU;
-import static com.adonai.admissiontracker.Constants.University.SPB_GMU;
 
 /**
  * A placeholder fragment containing a simple view.
@@ -99,40 +98,28 @@ public class SelectorFragment extends BaseFragment {
             case SPB_GMU:
                 setLayoutSpbGmu(doc);
                 break;
+            case ITMO:
+                setLayoutItmo(doc);
             default:
                 break;
         }
     }
 
+    private void setLayoutItmo(final Element page) {
+        final Elements links = page.select(".page_content tbody a[href]");
+        final Spinner levelSelector = new Spinner(getActivity());
+        final CommonSpecialtyAdapter elementAdapter = new CommonSpecialtyAdapter(getActivity(), links);
+        levelSelector.setAdapter(elementAdapter);
+        levelSelector.setOnItemSelectedListener(new CommonSpecialtySelectListener(elementAdapter));
+        mSpinnersHolder.addView(levelSelector);
+    }
+
     private void setLayoutSpbGmu(final Element tree) {
         final Elements links = tree.select("a[href]");
         final Spinner levelSelector = new Spinner(getActivity());
-        final SpbGmuElementAdapter elementAdapter = new SpbGmuElementAdapter(getActivity(), links);
+        final CommonSpecialtyAdapter elementAdapter = new CommonSpecialtyAdapter(getActivity(), links);
         levelSelector.setAdapter(elementAdapter);
-        levelSelector.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                final Element selectedLink = elementAdapter.getItem(position);
-                if(selectedLink != null) {
-                    try {
-                        final Integer budgetCount = Integer.valueOf(selectedLink.parent().nextElementSibling().nextElementSibling().text());
-                        getFragmentManager()
-                            .beginTransaction()
-                                .addToBackStack("ShowingSpbGmuDataFragment")
-                                .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
-                                .replace(R.id.container, ShowSpbuGmuDataFragment.forPage(selectedLink.text(), new URL(new URL(SPB_GMU.getUrl()), selectedLink.attr("href")).toString(), budgetCount))
-                            .commit();
-                    } catch (MalformedURLException e) {
-                        Toast.makeText(getActivity(), R.string.invalid_url, Toast.LENGTH_SHORT).show();
-                    } // should never happen
-                }
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-
-            }
-        });
+        levelSelector.setOnItemSelectedListener(new CommonSpecialtySelectListener(elementAdapter));
         mSpinnersHolder.addView(levelSelector);
     }
 
@@ -150,7 +137,7 @@ public class SelectorFragment extends BaseFragment {
                     public void onClick(View v) {
                         getFragmentManager()
                             .beginTransaction()
-                                .addToBackStack("ShowingSpbuDataFragment")
+                                .addToBackStack(String.format("Showing%sDataFragment", mSelectedInstitution.toString()))
                                 .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
                                 .replace(R.id.container, ShowSpbuDataFragment.forPage(div.text(), SPBU.getUrl() + url))
                             .commit();
@@ -162,7 +149,7 @@ public class SelectorFragment extends BaseFragment {
         }
 
         final Spinner levelSelector = new Spinner(getActivity());
-        final SpbuElementAdapter elementAdapter = new SpbuElementAdapter(getActivity(), childListItems);
+        final SpbuSpecialtyTreeElementAdapter elementAdapter = new SpbuSpecialtyTreeElementAdapter(getActivity(), childListItems);
         levelSelector.setAdapter(elementAdapter);
         levelSelector.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
@@ -190,16 +177,9 @@ public class SelectorFragment extends BaseFragment {
             mSelectedInstitution = Constants.University.values()[position];
             switch (mSelectedInstitution) {
                 case NONE: // nothing selected
-                    break;
-                case SPBU:
-                    mProgressDialog.show();
-                    getMainActivity().getService().retrievePage(SPBU.getUrl(), mHandler);
-                    break;
-                case SPB_GMU:
-                    mProgressDialog.show();
-                    getMainActivity().getService().retrievePage(SPB_GMU.getUrl(), mHandler);
-                    break;
                 default:
+                    mProgressDialog.show();
+                    getMainActivity().getService().retrievePage(mSelectedInstitution.getUrl(), mHandler);
                     break;
             }
         }
@@ -221,17 +201,18 @@ public class SelectorFragment extends BaseFragment {
                 case SPBU: // SPBU
                     getFragmentManager()
                         .beginTransaction()
-                            .addToBackStack("ShowingSpbuDataFragment")
+                            .addToBackStack(String.format("Showing%sDataFragment", mSelectedInstitution.toString()))
                             .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
                             .replace(R.id.container, ShowSpbuDataFragment.forFavorite(selectedFav))
                         .commit();
                     break;
                 case SPB_GMU:
+                case ITMO:
                     getFragmentManager()
                         .beginTransaction()
-                            .addToBackStack("ShowingSpbGmuDataFragment")
+                            .addToBackStack(String.format("Showing%sDataFragment", mSelectedInstitution.toString()))
                             .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
-                            .replace(R.id.container, ShowSpbuGmuDataFragment.forFavorite(selectedFav))
+                            .replace(R.id.container, ShowCommonDataFragment.forFavorite(selectedFav))
                         .commit();
                     break;
             }
@@ -242,9 +223,9 @@ public class SelectorFragment extends BaseFragment {
         }
     }
 
-    private class SpbuElementAdapter extends WithZeroAdapter<Element> {
+    private class SpbuSpecialtyTreeElementAdapter extends WithZeroAdapter<Element> {
 
-        public SpbuElementAdapter(Context context, Elements objects) {
+        public SpbuSpecialtyTreeElementAdapter(Context context, Elements objects) {
             super(context, objects);
         }
 
@@ -266,9 +247,9 @@ public class SelectorFragment extends BaseFragment {
         }
     }
 
-    private class SpbGmuElementAdapter extends WithZeroAdapter<Element> {
+    private class CommonSpecialtyAdapter extends WithZeroAdapter<Element> {
 
-        public SpbGmuElementAdapter(Context context, Elements objects) {
+        public CommonSpecialtyAdapter(Context context, Elements objects) {
             super(context, objects);
         }
 
@@ -311,6 +292,37 @@ public class SelectorFragment extends BaseFragment {
             text.setText(item == null ? getContext().getString(R.string.select_from_favs) : item.getTitle());
 
             return view;
+        }
+    }
+
+    private class CommonSpecialtySelectListener implements AdapterView.OnItemSelectedListener {
+        private final ArrayAdapter<Element> elementAdapter;
+
+        public CommonSpecialtySelectListener(ArrayAdapter<Element> elementAdapter) {
+            this.elementAdapter = elementAdapter;
+        }
+
+        @Override
+        public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+            final Element selectedLink = elementAdapter.getItem(position);
+            if(selectedLink != null) {
+                try {
+                    final Integer budgetCount = Integer.valueOf(selectedLink.parent().nextElementSibling().nextElementSibling().text());
+                    getFragmentManager()
+                        .beginTransaction()
+                            .addToBackStack(String.format("Showing%sDataFragment", mSelectedInstitution.toString()))
+                            .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
+                            .replace(R.id.container, ShowCommonDataFragment.forPage(mSelectedInstitution, selectedLink.text(), new URL(new URL(mSelectedInstitution.getUrl()), selectedLink.attr("href")).toString(), budgetCount))
+                        .commit();
+                } catch (MalformedURLException e) {
+                    Toast.makeText(getActivity(), R.string.invalid_url, Toast.LENGTH_SHORT).show();
+                } // should never happen
+            }
+        }
+
+        @Override
+        public void onNothingSelected(AdapterView<?> parent) {
+
         }
     }
 }
