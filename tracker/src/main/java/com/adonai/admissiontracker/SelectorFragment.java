@@ -176,8 +176,12 @@ public class SelectorFragment extends BaseFragment {
 
         @Override
         public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+            final Constants.University newSelection = Constants.University.values()[position];
+            if(mSelectedInstitution == newSelection)
+                return; // если уже выбран институт, ничего делать не нужно
+
             mSpinnersHolder.removeAllViews();
-            mSelectedInstitution = Constants.University.values()[position];
+            mSelectedInstitution = newSelection;
             switch (mSelectedInstitution) {
                 case NONE: // nothing selected
                     break;
