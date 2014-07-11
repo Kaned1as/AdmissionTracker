@@ -4,6 +4,7 @@ import android.app.FragmentTransaction;
 import android.content.Context;
 import android.os.Bundle;
 import android.os.Message;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -65,7 +66,8 @@ public class SelectorFragment extends BaseFragment {
         switch (msg.what) {
             case Constants.GET_URL: // got our URL back
                 final NetworkService.NetworkInfo ni = (NetworkService.NetworkInfo) msg.obj;
-                updateLayouts(ni.content);
+                if(isVisible()) // if we are still in fragment
+                    updateLayouts(ni.content);
                 break;
         }
 
@@ -86,6 +88,7 @@ public class SelectorFragment extends BaseFragment {
             } else
                 mFavSelector.setVisibility(View.INVISIBLE);
         } catch (SQLException e) {
+            Log.e("SelectorFragment", "Error retrieving favorites!", e);
             Toast.makeText(getActivity(), R.string.database_error, Toast.LENGTH_SHORT).show();
         }
 

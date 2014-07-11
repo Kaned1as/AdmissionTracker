@@ -2,6 +2,7 @@ package com.adonai.admissiontracker;
 
 import android.graphics.Color;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -83,7 +84,7 @@ public class StatisticsFragment extends BaseFragment {
             }
 
         } catch (SQLException e) {
-            e.printStackTrace();
+            Log.e("StatisticsFragment", "Error retrieving statistics!", e);
             Toast.makeText(getActivity(), R.string.cannot_load_statistics, Toast.LENGTH_SHORT).show();
             getFragmentManager().popBackStack();
         }

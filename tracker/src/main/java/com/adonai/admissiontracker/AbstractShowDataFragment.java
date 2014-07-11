@@ -2,6 +2,7 @@ package com.adonai.admissiontracker;
 
 import android.app.FragmentTransaction;
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -65,6 +66,7 @@ public abstract class AbstractShowDataFragment extends BaseFragment implements D
                     Toast.makeText(getActivity(), R.string.added_to_favs, Toast.LENGTH_SHORT).show();
                     mShowStatistics.setVisibility(View.VISIBLE);
                 } catch (SQLException e) {
+                    Log.e("DataShowFragment", "Error creating favorite!", e);
                     Toast.makeText(getActivity(), R.string.database_error, Toast.LENGTH_SHORT).show();
                 }
             else
@@ -73,6 +75,7 @@ public abstract class AbstractShowDataFragment extends BaseFragment implements D
                     Toast.makeText(getActivity(), R.string.removed_from_favs, Toast.LENGTH_SHORT).show();
                     mShowStatistics.setVisibility(View.INVISIBLE);
                 } catch (SQLException e) {
+                    Log.e("DataShowFragment", "Error deleting favorite!", e);
                     Toast.makeText(getActivity(), R.string.database_error, Toast.LENGTH_SHORT).show();
                 }
         }
@@ -97,6 +100,7 @@ public abstract class AbstractShowDataFragment extends BaseFragment implements D
                         .add(R.id.container, StatisticsFragment.forFavorite(selected))
                         .commit();
             } catch (SQLException e) {
+                Log.e("DataShowFragment", "Error searching favorite!", e);
                 Toast.makeText(getActivity(), R.string.favorite_not_found, Toast.LENGTH_SHORT).show();
             }
         }
@@ -113,11 +117,12 @@ public abstract class AbstractShowDataFragment extends BaseFragment implements D
     @Override
     public boolean isUpdate(Statistics newStat) {
         try {
+            Log.d("Statistics", String.format("Checking statistics update status for %s, new stat gathered at %s", newStat.getParent().getName(), newStat.getTimestamp().toString()));
             final QueryBuilder<Statistics, Integer> qb = DatabaseFactory.getHelper().getStatDao().queryBuilder();
             final Statistics last = qb.orderBy("timestamp", false).where().eq("parent_id", newStat.getParent()).queryForFirst();
             return last != null && !newStat.contentEquals(last);
         } catch (SQLException e) {
-            e.printStackTrace();
+            Log.e("Data Fragment", "Error retrieving last statistics!", e);
             return false;
         }
     }

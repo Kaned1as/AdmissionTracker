@@ -12,6 +12,7 @@ import android.os.HandlerThread;
 import android.os.IBinder;
 import android.os.Message;
 import android.preference.PreferenceManager;
+import android.util.Log;
 import android.util.Pair;
 
 import com.adonai.admissiontracker.database.DatabaseFactory;
@@ -134,7 +135,7 @@ public class NetworkService extends Service implements Handler.Callback, SharedP
                         }
                     }
                 } catch (Exception ignored) {
-                    //throw new RuntimeException(ignored);
+                    Log.e("Network Service", "Error making update!", ignored);
                 }
                 break;
             default:

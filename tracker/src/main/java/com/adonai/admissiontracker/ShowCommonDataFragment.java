@@ -2,6 +2,7 @@ package com.adonai.admissiontracker;
 
 import android.os.Bundle;
 import android.os.Message;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -212,6 +213,7 @@ public class ShowCommonDataFragment extends AbstractShowDataFragment {
                         mFavButton.setChecked(false);
                     mFavButton.setOnCheckedChangeListener(mFavClickListener);
                 } catch (SQLException e) {
+                    Log.e("DataShowFragment", "Error retrieving favorite!", e);
                     Toast.makeText(getActivity(), R.string.database_error, Toast.LENGTH_SHORT).show();
                 }
 
@@ -247,6 +249,7 @@ public class ShowCommonDataFragment extends AbstractShowDataFragment {
                     DatabaseFactory.getHelper().getStatDao().create(stInfo.stats);
             }
         } catch (SQLException e) {
+            Log.e("DataShowFragment", "Error creating statistics!", e);
             Toast.makeText(getActivity(), R.string.cannot_update_statistics, Toast.LENGTH_SHORT).show();
         }
     }
