@@ -261,33 +261,38 @@ public class ShowCommonDataFragment extends AbstractShowDataFragment {
         currentStatistics.setParent(fav);
 
         final Element myRow = findRowWithName(data, fav.getName());
-        final Elements myColumns = myRow.children();
+        final String myType = myRow.children().get(4).text();
 
         currentStatistics.setTotalSubmitted(data.size());
         currentStatistics.setTimestamp(new Date());
 
         int originalsAbove = 0;
         int copiesAbove = 0;
+        int maxBudget = fav.getMaxBudgetCount();
         final Queue<Integer> allPoints = new PriorityQueue<>(data.size(), Collections.reverseOrder());
         for(Element row : data) {
             final Elements columns = row.children();
             final int points = Integer.valueOf(columns.get(5).text());
-            allPoints.offer(points);
+            final String type = columns.get(4).text();
             final boolean isOriginal = columns.get(6).text().equals("да");
+            if(type.equals("Без испытаний")) // отнимаем от бюджетных мест
+                --maxBudget;
 
-            if(points > fav.getPoints()) {
-                if (isOriginal)
-                    originalsAbove++;
-                else
-                    copiesAbove++;
+            if(type.equals(myType)) {
+                allPoints.offer(points);
+                if (points > fav.getPoints()) {
+                    if (isOriginal)
+                        originalsAbove++;
+                    else
+                        copiesAbove++;
+                }
             }
         }
 
         int neededPoints = 0;
-        int passed = fav.getMaxBudgetCount();
-        while (allPoints.size() > 0 && passed > 0) {
+        while (allPoints.size() > 0 && maxBudget > 0) {
             neededPoints = allPoints.poll();
-            passed--;
+            maxBudget--;
         }
 
         currentStatistics.setCopiesAbove(copiesAbove);
