@@ -1,5 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:id="@+id/refresh" android:title="@string/refresh" android:icon="@drawable/ic_menu_refresh" android:showAsAction="ifRoom" />
+    <item
+        android:id="@+id/refresh"
+        android:title="@string/refresh"
+        android:icon="@android:drawable/ic_popup_sync"
+        android:showAsAction="ifRoom" />
+
+    <item
+        android:id="@+id/open_in_browser"
+        android:title="@string/open_in_browser"
+        android:icon="@android:drawable/ic_menu_view"
+        android:showAsAction="never" />
 </menu>

@@ -119,7 +119,7 @@ public class NetworkService extends Service implements Handler.Callback, SharedP
                         final Document page = Jsoup.parse(pageData);
 
                         final Constants.University institution = Constants.University.values()[curFav.getParentInstitution()];
-                        final DataRetriever statRetriever = DataRetrieverFactory.newInstance(institution);
+                        final DataRetriever statRetriever = new DataRetrieverFactory(institution).newInstance();
                         final Statistics stats = statRetriever.retrieveStatistics(curFav, new NetworkInfo(page, mClient.getLastModified())).stats;
 
                         final NotificationManager nm = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
@@ -127,7 +127,7 @@ public class NetworkService extends Service implements Handler.Callback, SharedP
                         qb.where().eq("parent_id", curFav).and().eq("timestamp", stats.getTimestamp());
                         if (qb.queryForFirst() == null) { // we haven't this row in DB
                             if(statRetriever.isUpdate(stats)) {
-                                final Notification toShow = createNotification(Constants.VIEW_FORMAT.format(stats.getTimestamp()), stats.getParent().getTitle());
+                                final Notification toShow = createNotification(curFav, Constants.VIEW_FORMAT.format(stats.getTimestamp()));
                                 nm.notify(NEWS_NOTIFICATION_ID, toShow); // запускаем уведомление
                             }
                             DatabaseFactory.getHelper().getStatDao().create(stats); // сохраняем текущую статистику в БД
@@ -174,15 +174,16 @@ public class NetworkService extends Service implements Handler.Callback, SharedP
 
     // Создаем уведомление в статусной строке - для принудительно живого сервиса в Foreground-режиме
     @SuppressWarnings("deprecation") // we need min 14 API, not 16
-    private Notification createNotification(String date, String text)
+    private Notification createNotification(Favorite fav, String date)
     {
         final Intent intent = new Intent(this, MainFlowActivity.class); // при клике на уведомление открываем приложение
+        intent.putExtra(Constants.FAVORITE_EXTRA, fav.getTitle());
         intent.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
 
         final Notification.Builder builder = new Notification.Builder(this)
                 .setSmallIcon(R.drawable.ic_launcher_notification)
                 .setContentTitle(getString(R.string.updates_present))
-                .setContentText(date + ": " + text)
+                .setContentText(date + ": " + fav.getTitle())
                 .setAutoCancel(true)
                 .setContentIntent(PendingIntent.getActivity(this, 0, intent, 0));
 

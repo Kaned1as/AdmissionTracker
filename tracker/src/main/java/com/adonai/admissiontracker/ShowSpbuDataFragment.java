@@ -4,8 +4,6 @@ import android.os.Bundle;
 import android.os.Message;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -102,20 +100,15 @@ public class ShowSpbuDataFragment extends AbstractShowDataFragment {
     }
 
     @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        super.onCreateOptionsMenu(menu, inflater);
-        inflater.inflate(R.menu.data_fragment, menu);
-    }
-
-    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.refresh:
                 mProgressDialog.show();
                 getMainActivity().getService().retrievePage(getArguments().getString(URL_KEY), mHandler);
-                break;
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
         }
-        return super.onOptionsItemSelected(item);
     }
 
     @Override
@@ -236,11 +229,6 @@ public class ShowSpbuDataFragment extends AbstractShowDataFragment {
         stInfo.stats.setTimestamp(new Date(data.lastModified));
 
         return stInfo;
-    }
-
-    @Override
-    public BaseFragment getFragment() {
-        return this;
     }
 
     private class NameSelectorListener implements AdapterView.OnItemSelectedListener {

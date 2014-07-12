@@ -3,6 +3,9 @@ package com.adonai.admissiontracker;
 import android.content.Context;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -91,11 +94,11 @@ public abstract class AbstractShowDataFragment extends BaseFragment implements D
                     throw new SQLException("Not found!");
 
                 getFragmentManager()
-                        .beginTransaction()
+                    .beginTransaction()
                         .addToBackStack("ShowingStatisticsFragment")
                         .hide(AbstractShowDataFragment.this)
                         .add(R.id.container, StatisticsFragment.forFavorite(selected))
-                        .commit();
+                    .commit();
             } catch (SQLException e) {
                 Log.e("DataShowFragment", "Error searching favorite!", e);
                 Toast.makeText(getActivity(), R.string.favorite_not_found, Toast.LENGTH_SHORT).show();
@@ -121,6 +124,22 @@ public abstract class AbstractShowDataFragment extends BaseFragment implements D
         } catch (SQLException e) {
             Log.e("Data Fragment", "Error retrieving last statistics!", e);
             return false;
+        }
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        inflater.inflate(R.menu.data_fragment, menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.open_in_browser:
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
         }
     }
 

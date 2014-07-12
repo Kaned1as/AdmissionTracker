@@ -17,8 +17,6 @@ public interface DataRetriever {
 
     StudentInfo retrieveStatistics(Favorite fav, NetworkService.NetworkInfo page) throws Exception;
 
-    BaseFragment getFragment();
-
     boolean isUpdate(Statistics newStat);
 
 }

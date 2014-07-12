@@ -1,6 +1,5 @@
 package com.adonai.admissiontracker;
 
-import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -26,7 +25,7 @@ import java.util.Date;
 import java.util.List;
 
 import static android.view.ViewGroup.LayoutParams;
-import static com.jjoe64.graphview.GraphViewSeries.*;
+import static com.jjoe64.graphview.GraphViewSeries.GraphViewSeriesStyle;
 
 /**
  * Created by adonai on 07.07.14.
@@ -57,6 +56,8 @@ public class StatisticsFragment extends BaseFragment {
 
         mLineGraph = new LineGraphView(getActivity(), getString(R.string.statistics));
         mLineGraph.setDrawBackground(true);
+        mLineGraph.setDrawDataPoints(true);
+        mLineGraph.setScalable(true);
         mLineGraph.setCustomLabelFormatter(new CustomLabelFormatter() {
             @Override
             public String formatLabel(double value, boolean isValueX) {
@@ -131,12 +132,16 @@ public class StatisticsFragment extends BaseFragment {
                 }
                 data[i] = new GraphView.GraphViewData(x, y != null ? y : 0);
             }
-            final GraphViewSeries series = new GraphViewSeries(parent.getItemAtPosition(position).toString(), new GraphViewSeriesStyle(Color.rgb(90, 250, 00), 5), data);
+            final GraphViewSeries series = new GraphViewSeries(parent.getItemAtPosition(position).toString(), new GraphViewSeriesStyle(getResources().getColor(R.color.double_view_header_color), 5), data);
             mLineGraph.addSeries(series);
+            if(mStatistics.size() > 100) {
+                float start = mStatistics.get(mStatistics.size() - 100).getTimestamp().getTime();
+                float end = mStatistics.get(mStatistics.size() - 1).getTimestamp().getTime();
+                mLineGraph.setViewPort(start, end - start);
+            }
             //final Statistics firstStat = mStatistics.get(0);
             //final Statistics lastStat = mStatistics.get(mStatistics.size() - 1);
             //mLineGraph.setViewPort(firstStat.getTimestamp().getTime(), lastStat.getTimestamp().getTime());
-            mLineGraph.setScalable(true);
         }
 
         @Override

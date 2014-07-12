@@ -177,6 +177,7 @@ public class SelectorFragment extends BaseFragment {
         @Override
         public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
             mSpinnersHolder.removeAllViews();
+            mFavSelector.setVisibility(View.INVISIBLE);
             mSelectedInstitution = Constants.University.values()[position];
             switch (mSelectedInstitution) {
                 case NONE: // nothing selected
@@ -201,25 +202,12 @@ public class SelectorFragment extends BaseFragment {
             if(selectedFav == null) // prompt selected
                 return;
 
-            switch (mSelectedInstitution) {
-                case SPBU: // SPBU
-                    getFragmentManager()
-                        .beginTransaction()
-                            .addToBackStack(String.format("Showing%sDataFragment", mSelectedInstitution.toString()))
-                            .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
-                            .replace(R.id.container, ShowSpbuDataFragment.forFavorite(selectedFav))
-                        .commit();
-                    break;
-                case SPB_GMU:
-                case ITMO:
-                    getFragmentManager()
-                        .beginTransaction()
-                            .addToBackStack(String.format("Showing%sDataFragment", mSelectedInstitution.toString()))
-                            .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
-                            .replace(R.id.container, ShowCommonDataFragment.forFavorite(selectedFav))
-                        .commit();
-                    break;
-            }
+            getFragmentManager()
+                .beginTransaction()
+                    .addToBackStack(String.format("Showing%sDataFragment", mSelectedInstitution.toString()))
+                    .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
+                    .replace(R.id.container, new DataRetrieverFactory(mSelectedInstitution).forFavorite(selectedFav))
+                .commit();
         }
 
         @Override

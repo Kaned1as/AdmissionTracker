@@ -1,6 +1,7 @@
 package com.adonai.admissiontracker;
 
 import android.app.Activity;
+import android.app.FragmentTransaction;
 import android.content.ComponentName;
 import android.content.Intent;
 import android.content.ServiceConnection;
@@ -8,8 +9,16 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+
+import com.adonai.admissiontracker.database.DatabaseFactory;
+import com.adonai.admissiontracker.entities.Favorite;
+
+import java.sql.SQLException;
+
+import static com.adonai.admissiontracker.Constants.*;
 
 
 public class MainFlowActivity extends Activity {
@@ -44,11 +53,15 @@ public class MainFlowActivity extends Activity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        unbindService(mServiceConn);
     }
 
     @Override
     protected void onStart() {
         super.onStart();
+        if(mService != null)
+            return;
+
         startService(mServiceCaller); // чтобы сервис не умирал после закрытия UI
         final boolean result = bindService(mServiceCaller, mServiceConn, 0); // change to BIND_IMPORTANT
             if(!result)
@@ -56,9 +69,33 @@ public class MainFlowActivity extends Activity {
     }
 
     @Override
-    protected void onStop() {
-        super.onStop();
-        unbindService(mServiceConn);
+    protected void onResume() {
+        super.onResume();
+        if(getIntent().hasExtra(FAVORITE_EXTRA)) {
+            final String favId = getIntent().getStringExtra(FAVORITE_EXTRA);
+            try {
+                final Favorite fav = DatabaseFactory.getHelper().getFavoritesDao().queryForId(favId);
+                if(fav != null) {
+                    final University univ = University.values()[fav.getParentInstitution()];
+                    getFragmentManager()
+                        .beginTransaction()
+                            .addToBackStack(String.format("Showing%sDataFragment", univ.toString()))
+                            .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
+                            .replace(R.id.container, new DataRetrieverFactory(univ).forFavorite(fav))
+                        .commit();
+                }
+            } catch (SQLException e) {
+                Log.e("MainFlow", String.format("Error retrieving favorite for notification click! Favorite is %s", favId), e);
+            } finally {
+                getIntent().removeExtra(FAVORITE_EXTRA);
+            }
+        }
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        setIntent(intent);
     }
 
     @Override

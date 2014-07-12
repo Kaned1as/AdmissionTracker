@@ -6,6 +6,7 @@ import java.text.SimpleDateFormat;
  * Created by adonai on 29.06.14.
  */
 public class Constants {
+    public final static  String FAVORITE_EXTRA = "offered.favorite";
 
     public final static  SimpleDateFormat VIEW_FORMAT = new SimpleDateFormat("dd.MM.yyyy\nHH:mm:ss");
     public final static  SimpleDateFormat DDMMHHmm = new SimpleDateFormat("dd.MM HH:mm");

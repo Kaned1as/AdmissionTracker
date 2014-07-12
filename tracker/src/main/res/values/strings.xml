@@ -3,7 +3,7 @@
     <string name="app_name">Поступалка</string>
     <string name="action_settings">Настройки</string>
     <string name="select_institution">Выберите ВУЗ</string>
-    <string name="spbu">СПбГУ</string>
+    <string name="spbu">СПбГУ (ранж. списков ещё нет)</string>
     <string name="spb_gmu">СПб ГМУ</string>
     <string name="itmo">ИТМО</string>
     <string name="network_error">Ошибка сети</string>
@@ -58,4 +58,5 @@
     <string name="statistics_not_collected">Статистика ещё не собрана! Отследите хотя бы несколько часов!</string>
     <string name="autoupdate_interval">Интервал обновления</string>
     <string name="autoupdate_interval_sum">Как часто выполнять обновление информации (чем меньше, тем подробнее статистика)</string>
+    <string name="open_in_browser">Открыть в браузере</string>
 </resources>
