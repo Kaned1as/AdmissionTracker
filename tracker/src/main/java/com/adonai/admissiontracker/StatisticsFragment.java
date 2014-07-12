@@ -62,7 +62,7 @@ public class StatisticsFragment extends BaseFragment {
             public String formatLabel(double value, boolean isValueX) {
                 if (isValueX) {
                     // transform number to time
-                    return Constants.DDMM.format(new Date((long) value));
+                    return Constants.DDMMHHmm.format(new Date((long) value));
                 } else
                     return String.valueOf((int) value);
             }

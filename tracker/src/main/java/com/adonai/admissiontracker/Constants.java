@@ -8,7 +8,7 @@ import java.text.SimpleDateFormat;
 public class Constants {
 
     public final static  SimpleDateFormat VIEW_FORMAT = new SimpleDateFormat("dd.MM.yyyy\nHH:mm:ss");
-    public final static  SimpleDateFormat DDMM = new SimpleDateFormat("dd.MM");
+    public final static  SimpleDateFormat DDMMHHmm = new SimpleDateFormat("dd.MM HH:mm");
 
     // Opcodes
     public final static int GET_URL = 0;

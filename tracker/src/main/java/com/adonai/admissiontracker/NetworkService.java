@@ -126,12 +126,11 @@ public class NetworkService extends Service implements Handler.Callback, SharedP
                         final QueryBuilder<Statistics, Integer> qb = DatabaseFactory.getHelper().getStatDao().queryBuilder();
                         qb.where().eq("parent_id", curFav).and().eq("timestamp", stats.getTimestamp());
                         if (qb.queryForFirst() == null) { // we haven't this row in DB
-                            DatabaseFactory.getHelper().getStatDao().create(stats); // сохраняем текущую статистику в БД
-
                             if(statRetriever.isUpdate(stats)) {
                                 final Notification toShow = createNotification(Constants.VIEW_FORMAT.format(stats.getTimestamp()), stats.getParent().getTitle());
                                 nm.notify(NEWS_NOTIFICATION_ID, toShow); // запускаем уведомление
                             }
+                            DatabaseFactory.getHelper().getStatDao().create(stats); // сохраняем текущую статистику в БД
                         }
                     }
                 } catch (Exception ignored) {
