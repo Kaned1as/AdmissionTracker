@@ -1,6 +1,5 @@
 package com.adonai.admissiontracker;
 
-import android.app.FragmentTransaction;
 import android.content.Context;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -94,9 +93,7 @@ public abstract class AbstractShowDataFragment extends BaseFragment implements D
                 getFragmentManager()
                         .beginTransaction()
                         .addToBackStack("ShowingStatisticsFragment")
-                        .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
                         .hide(AbstractShowDataFragment.this)
-                        .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
                         .add(R.id.container, StatisticsFragment.forFavorite(selected))
                         .commit();
             } catch (SQLException e) {

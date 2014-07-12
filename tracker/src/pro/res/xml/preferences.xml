@@ -14,6 +14,6 @@
         android:summary="@string/autoupdate_interval_sum"
         android:entries="@array/update_intervals_titles"
         android:entryValues="@array/update_intervals_values"
-        android:defaultValue="5" />
+        android:defaultValue="1800000" />
 
 </PreferenceScreen>

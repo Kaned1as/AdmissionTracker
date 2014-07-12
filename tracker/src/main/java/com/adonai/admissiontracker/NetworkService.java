@@ -32,7 +32,7 @@ public class NetworkService extends Service implements Handler.Callback, SharedP
     public final static String PREF_AUTOUPDATE_INTERVAL = "auto.update.interval";
     public final static String PREF_CLICKTIME = "last.click.time";
 
-    private final static String DEFAULT_UPDATE_INTERVAL = "5";
+    private final static String DEFAULT_UPDATE_INTERVAL = "1800000";
     private final static long DROP_MARK_INTERVAL = 86400000; // 1 день
 
     private static final int NEWS_NOTIFICATION_ID = 17002;
@@ -42,7 +42,7 @@ public class NetworkService extends Service implements Handler.Callback, SharedP
     private SharedPreferences mPreferences;
 
     private boolean isPeriodicCheckEnabled;
-    private long updateTime = 5 * 60 * 1000;
+    private long updateTime = 30 * 60 * 1000;
 
     public class ServiceRetriever extends Binder {
 
