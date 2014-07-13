@@ -12,4 +12,10 @@
         android:title="@string/open_in_browser"
         android:icon="@android:drawable/ic_menu_view"
         android:showAsAction="never" />
+
+    <item
+        android:id="@+id/about"
+        android:title="@string/about"
+        android:icon="@android:drawable/ic_dialog_info"
+        android:showAsAction="never" />
 </menu>

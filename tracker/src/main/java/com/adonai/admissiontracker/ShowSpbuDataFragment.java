@@ -4,7 +4,6 @@ import android.os.Bundle;
 import android.os.Message;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -35,8 +34,6 @@ import static com.adonai.admissiontracker.Constants.University.SPBU;
  */
 public class ShowSpbuDataFragment extends AbstractShowDataFragment {
 
-    private static final String TITLE_KEY = "page.title";       // MANDATORY
-    private static final String URL_KEY = "page.url";           // MANDATORY
     private static final String NAME_KEY = "favorite.name";
 
     private long mLastUpdated;
@@ -97,18 +94,6 @@ public class ShowSpbuDataFragment extends AbstractShowDataFragment {
         mNeededPoints = (DoubleTextView) rootView.findViewById(R.id.needed_points);
 
         return rootView;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.refresh:
-                mProgressDialog.show();
-                getMainActivity().getService().retrievePage(getArguments().getString(URL_KEY), mHandler);
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
-        }
     }
 
     @Override

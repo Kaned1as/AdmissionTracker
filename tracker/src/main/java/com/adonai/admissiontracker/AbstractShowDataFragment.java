@@ -1,6 +1,9 @@
 package com.adonai.admissiontracker;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.Intent;
+import android.net.Uri;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -29,6 +32,9 @@ import java.text.ParseException;
  * Created by adonai on 05.07.14.
  */
 public abstract class AbstractShowDataFragment extends BaseFragment implements DataRetriever {
+
+    protected static final String TITLE_KEY = "page.title";       // MANDATORY
+    protected static final String URL_KEY = "page.url";           // MANDATORY
 
     protected Button mShowStatistics;
     protected Spinner mNameSelector;
@@ -136,7 +142,20 @@ public abstract class AbstractShowDataFragment extends BaseFragment implements D
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
+            case R.id.refresh:
+                mProgressDialog.show();
+                getMainActivity().getService().retrievePage(getArguments().getString(URL_KEY), mHandler);
+                return true;
             case R.id.open_in_browser:
+                final Intent i = new Intent(Intent.ACTION_VIEW);
+                i.setData(Uri.parse(getArguments().getString(URL_KEY)));
+                startActivity(i);
+                return true;
+            case R.id.about:
+                final AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+                builder.setIcon(R.drawable.ic_launcher_notification).setTitle(R.string.app_name);
+                builder.setMessage(R.string.about_summary).setPositiveButton(android.R.string.ok, null);
+                builder.create().show();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);

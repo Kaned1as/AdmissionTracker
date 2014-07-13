@@ -4,7 +4,6 @@ import android.os.Bundle;
 import android.os.Message;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -35,9 +34,7 @@ import java.util.Queue;
  */
 public class ShowCommonDataFragment extends AbstractShowDataFragment {
 
-    private static final String TITLE_KEY = "page.title";               // MANDATORY
     private static final String INST_KEY = "parent.institution";        // MANDATORY
-    private static final String URL_KEY = "page.url";                   // MANDATORY
     private static final String NAME_KEY = "favorite.name";
     private static final String MAX_BUDGET = "max.budget.number";
 
@@ -150,17 +147,6 @@ public class ShowCommonDataFragment extends AbstractShowDataFragment {
         mNameSelector.setSelection(previousIndex);
     }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.refresh:
-                mProgressDialog.show();
-                getMainActivity().getService().retrievePage(getArguments().getString(URL_KEY), mHandler);
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
-        }
-    }
 
     @Override
     public StudentInfo retrieveStatistics(Favorite fav, NetworkService.NetworkInfo data) throws Exception {
