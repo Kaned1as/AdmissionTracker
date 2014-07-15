@@ -30,6 +30,7 @@ public class MainFlowActivity extends Activity {
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
             mService = ((NetworkService.ServiceRetriever) service).getService();
+            handleIntentIfExists();
         }
 
         @Override
@@ -45,6 +46,11 @@ public class MainFlowActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main_flow);
 
+        startService(mServiceCaller); // чтобы сервис не умирал после закрытия UI
+        final boolean result = bindService(mServiceCaller, mServiceConn, 0); // change to BIND_IMPORTANT
+        if(!result)
+            throw new RuntimeException("Unable to connect to service!");
+
         if (savedInstanceState == null) {
             getFragmentManager().beginTransaction().add(R.id.container, new SelectorFragment()).commit();
         }
@@ -56,21 +62,7 @@ public class MainFlowActivity extends Activity {
         unbindService(mServiceConn);
     }
 
-    @Override
-    protected void onStart() {
-        super.onStart();
-        if(mService != null)
-            return;
-
-        startService(mServiceCaller); // чтобы сервис не умирал после закрытия UI
-        final boolean result = bindService(mServiceCaller, mServiceConn, 0); // change to BIND_IMPORTANT
-            if(!result)
-                throw new RuntimeException("Unable to connect to service!");
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
+    private void handleIntentIfExists() {
         if(getIntent().hasExtra(FAVORITE_EXTRA)) {
             final String favId = getIntent().getStringExtra(FAVORITE_EXTRA);
             try {
@@ -96,6 +88,9 @@ public class MainFlowActivity extends Activity {
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
         setIntent(intent);
+
+        if(mService != null)
+            handleIntentIfExists();
     }
 
     @Override
