@@ -71,7 +71,6 @@ public class MainFlowActivity extends Activity {
                     final University univ = University.values()[fav.getParentInstitution()];
                     getFragmentManager()
                         .beginTransaction()
-                            .addToBackStack(String.format("Showing%sDataFragment", univ.toString()))
                             .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
                             .replace(R.id.container, new DataRetrieverFactory(univ).forFavorite(fav))
                         .commit();
