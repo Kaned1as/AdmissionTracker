@@ -72,7 +72,9 @@ public class MainFlowActivity extends Activity {
                     getFragmentManager()
                         .beginTransaction()
                             .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
-                            .replace(R.id.container, new DataRetrieverFactory(univ).forFavorite(fav))
+                            .addToBackStack(String.format("Showing%sDataFragment", univ.toString()))
+                            .hide(getFragmentManager().findFragmentById(R.id.container))
+                            .add(R.id.container, new DataRetrieverFactory(univ).forFavorite(fav))
                         .commit();
                 }
             } catch (SQLException e) {
