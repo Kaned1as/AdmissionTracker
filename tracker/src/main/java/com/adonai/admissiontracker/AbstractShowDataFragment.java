@@ -126,7 +126,7 @@ public abstract class AbstractShowDataFragment extends BaseFragment implements D
             Log.d("Statistics", String.format("Checking statistics update status for %s, new stat gathered at %s", newStat.getParent().getName(), newStat.getTimestamp().toString()));
             final QueryBuilder<Statistics, Integer> qb = DatabaseFactory.getHelper().getStatDao().queryBuilder();
             final Statistics last = qb.orderBy("timestamp", false).where().eq("parent_id", newStat.getParent()).queryForFirst();
-            return last != null && !newStat.contentEquals(last);
+            return last == null || !newStat.contentEquals(last);
         } catch (SQLException e) {
             Log.e("Data Fragment", "Error retrieving last statistics!", e);
             return false;
