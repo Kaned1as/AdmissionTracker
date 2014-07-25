@@ -94,7 +94,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:id="@+id/originals"
-                app:header_text="@string/originals"
+                app:header_text="@string/without_exams"
                 android:layout_margin="5dp" />
 
             <view class="com.adonai.admissiontracker.views.DoubleTextView"
@@ -102,7 +102,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:id="@+id/copies"
-                app:header_text="@string/copies"
+                app:header_text="@string/contest"
                 android:layout_margin="5dp" />
 
             <view class="com.adonai.admissiontracker.views.DoubleTextView"

@@ -1,5 +1,8 @@
 package com.adonai.admissiontracker;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Message;
 import android.util.Log;
@@ -8,6 +11,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.Button;
+import android.widget.NumberPicker;
 import android.widget.Spinner;
 import android.widget.SpinnerAdapter;
 import android.widget.Toast;
@@ -25,7 +29,10 @@ import org.jsoup.select.Elements;
 import java.sql.SQLException;
 import java.text.ParseException;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
+import java.util.PriorityQueue;
+import java.util.Queue;
 
 import static com.adonai.admissiontracker.Constants.University.SPBU;
 
@@ -37,6 +44,8 @@ public class ShowSpbuDataFragment extends AbstractShowDataFragment {
     private static final String NAME_KEY = "favorite.name";
 
     private long mLastUpdated;
+
+    private int mBudgetCount;
 
     private Elements mStudents = null;
 
@@ -149,13 +158,49 @@ public class ShowSpbuDataFragment extends AbstractShowDataFragment {
     private void updateGrid(Favorite fav, StudentInfo stInfo) throws ParseException {
         mListNumber.setText((mStudents.indexOf(findRowWithName(mStudents, fav.getName())) + 1) + "/" + stInfo.stats.getTotalSubmitted());
         mAdmissionDate.setText(SPBU.getTimeFormat().format(stInfo.admissionDate));
-        //mPoints.setText();
-        //mOriginalsAbove.setText();
-        //mCopiesAbove.setText();
-        //mReclaimedAbove.setText();
+        mPoints.setText(fav.getPoints().toString());
+        mOriginalsAbove.setText(stInfo.stats.getOriginalsAbove().toString());
+        mCopiesAbove.setText(stInfo.stats.getCopiesAbove().toString());
+        mReclaimedAbove.setText("0");
         mLastTimestamp.setText(Constants.VIEW_FORMAT.format(stInfo.stats.getTimestamp()));
-        //mTotalReclaimed.setText();
-        //mNeededPoints.setText();
+        mTotalReclaimed.setText("0");
+        if(fav.getMaxBudgetCount() == 0) {
+            mNeededPoints.setText("?");
+            mNeededPoints.setTextColor(Color.RED);
+            mNeededPoints.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    final AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+                    builder.setTitle(R.string.select_budget_count);
+                    final NumberPicker np = new NumberPicker(getActivity());
+                    np.setMinValue(0);
+                    np.setMaxValue(500);
+                    np.setValue(80);
+                    builder.setView(np);
+                    builder.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            try {
+                                mBudgetCount = np.getValue();
+                                final Favorite toPersist = createFavForStudent(mNameSelector.getSelectedItemPosition());
+                                final StudentInfo stInfo = retrieveStatistics(toPersist, mStudents);
+                                updateGrid(toPersist, stInfo);
+                                if(mFavButton.isChecked()) // should update value in DB
+                                    DatabaseFactory.getHelper().getFavoritesDao().createOrUpdate(toPersist);
+                            } catch (ParseException | SQLException e) {
+                                Toast.makeText(getActivity(), R.string.database_error, Toast.LENGTH_SHORT).show();
+                            }
+
+                        }
+                    });
+                    builder.create().show();
+                }
+            });
+        } else {
+            mNeededPoints.setText(stInfo.stats.getNeededPoints().toString());
+            mNeededPoints.setOnClickListener(null);
+            mNeededPoints.setTextColor(Color.WHITE);
+        }
 
         try {
             //PreferenceFlow.class.getName();
@@ -176,13 +221,13 @@ public class ShowSpbuDataFragment extends AbstractShowDataFragment {
     private void clearGrid() {
         mListNumber.setText("");
         mAdmissionDate.setText("");
-        //mPoints.setText();
-        //mOriginalsAbove.setText();
-        //mCopiesAbove.setText();
-        //mReclaimedAbove.setText();
+        mPoints.setText("");
+        mOriginalsAbove.setText("");
+        mCopiesAbove.setText("");
+        mReclaimedAbove.setText("");
         mLastTimestamp.setText("");
-        //mTotalReclaimed.setText();
-        //mNeededPoints.setText();
+        mTotalReclaimed.setText("");
+        mNeededPoints.setText("");
     }
 
     private StudentInfo retrieveStatistics(Favorite fav, Elements data) throws ParseException {
@@ -193,10 +238,47 @@ public class ShowSpbuDataFragment extends AbstractShowDataFragment {
 
         final Element myRow = findRowWithName(data, fav.getName());
         final Elements myColumns = myRow.children();
-        final Date currentAdmissionDate = SPBU.getTimeFormat().parse(myColumns.get(5).text());
+        final Date currentAdmissionDate = SPBU.getTimeFormat().parse(myColumns.get(6).text());
 
         currentStatistics.setTotalSubmitted(data.size());
         currentStatistics.setTimestamp(new Date(mLastUpdated));
+
+        final String myType = myColumns.get(4).text();
+
+        int originalsAbove = 0; // fix when needed
+        int copiesAbove = 0; // fix when needed
+        Integer maxBudget = fav.getMaxBudgetCount(); //fav.getMaxBudgetCount();
+        final Queue<Integer> allPoints = new PriorityQueue<>(data.size(), Collections.reverseOrder());
+        for(Element row : data) {
+            final Elements columns = row.children();
+            final int points = columns.get(5).text().isEmpty() ? 0 : Integer.valueOf(columns.get(5).text());
+            final String type = columns.get(4).text();
+            //final boolean isOriginal = columns.get(6).text().equals("да");
+            if(type.equals("в/к") || type.equals("б/э")) { // отнимаем от бюджетных мест
+                --maxBudget;
+                ++originalsAbove;
+            }
+
+            if(type.equals(myType)) {
+                allPoints.offer(points);
+                if (points > fav.getPoints()) {
+                    //if (isOriginal)
+                    //    originalsAbove++;
+                    //else
+                        copiesAbove++;
+                }
+            }
+        }
+
+        int neededPoints = 0;
+        while (allPoints.size() > 0 && maxBudget > 0) {
+            neededPoints = allPoints.poll();
+            maxBudget--;
+        }
+
+        currentStatistics.setCopiesAbove(copiesAbove);
+        currentStatistics.setOriginalsAbove(originalsAbove);
+        currentStatistics.setNeededPoints(neededPoints);
 
         result.stats = currentStatistics;
         result.admissionDate = currentAdmissionDate;
@@ -224,8 +306,26 @@ public class ShowSpbuDataFragment extends AbstractShowDataFragment {
             mFavButton.setVisibility(row != null ? View.VISIBLE : View.INVISIBLE);
             mShowStatistics.setVisibility(row != null ? View.VISIBLE : View.INVISIBLE);
             if(row != null) {
-                // update grid
                 final Favorite toPersist = createFavForStudent(position);
+
+                // update favorite button state
+                try {
+                    final Favorite inDb = DatabaseFactory.getHelper().getFavoritesDao().queryForSameId(toPersist);
+
+                    mFavButton.setOnCheckedChangeListener(null);
+                    if(inDb != null) { // уже присутствует в БД, помечаем выделенным
+                        mFavButton.setChecked(true);
+                        mBudgetCount = inDb.getMaxBudgetCount() != null ? inDb.getMaxBudgetCount() : 0;
+                        toPersist.setMaxBudgetCount(mBudgetCount);
+                    } else // иначе снимаем выделение
+                        mFavButton.setChecked(false);
+                    mFavButton.setOnCheckedChangeListener(mFavClickListener);
+                } catch (SQLException e) {
+                    Log.e("DataShowFragment", "Error retrieving favorite!", e);
+                    Toast.makeText(getActivity(), R.string.database_error, Toast.LENGTH_SHORT).show();
+                }
+
+                // update grid
                 try {
                     final StudentInfo stInfo = retrieveStatistics(toPersist, mStudents);
                     updateGrid(toPersist, stInfo);
@@ -234,22 +334,6 @@ public class ShowSpbuDataFragment extends AbstractShowDataFragment {
                 } catch (NullPointerException e) {
                     Toast.makeText(getActivity(), R.string.wrong_page_format, Toast.LENGTH_SHORT).show();
                 }
-
-                // update favorite button state
-                try {
-                    final Favorite inDb = DatabaseFactory.getHelper().getFavoritesDao().queryForSameId(toPersist);
-
-                    mFavButton.setOnCheckedChangeListener(null);
-                    if(inDb != null) // уже присутствует в БД, помечаем выделенным
-                        mFavButton.setChecked(true);
-                    else // иначе снимаем выделение
-                        mFavButton.setChecked(false);
-                    mFavButton.setOnCheckedChangeListener(mFavClickListener);
-                } catch (SQLException e) {
-                    Log.e("DataShowFragment", "Error retrieving favorite!", e);
-                    Toast.makeText(getActivity(), R.string.database_error, Toast.LENGTH_SHORT).show();
-                }
-
             } else
                 clearGrid();
         }
@@ -269,9 +353,14 @@ public class ShowSpbuDataFragment extends AbstractShowDataFragment {
         if(index <= 0 || index > mStudents.size())
             throw new IllegalArgumentException("Unknown student index!");
 
+        final Element row = mStudents.get(index - 1);
+        final Elements columns = row.children();
+
         final Favorite toCreate = new Favorite(getArguments().getString(TITLE_KEY), getArguments().getString(URL_KEY));
         toCreate.setParentInstitution(SPBU.ordinal());
-        toCreate.setName(extractNameForStudent(mStudents.get(index - 1)));
+        toCreate.setName(extractNameForStudent(row));
+        toCreate.setPoints( columns.get(5).text().isEmpty() ? 0 : Integer.valueOf(columns.get(5).text()));
+        toCreate.setMaxBudgetCount(mBudgetCount);
 
         return toCreate;
     }

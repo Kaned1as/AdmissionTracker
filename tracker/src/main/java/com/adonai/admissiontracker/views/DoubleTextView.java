@@ -60,4 +60,8 @@ public class DoubleTextView extends FrameLayout {
     public void setText(CharSequence text) {
         mBody.setText(text);
     }
+
+    public void setTextColor(Integer color) {
+        mBody.setTextColor(color);
+    }
 }

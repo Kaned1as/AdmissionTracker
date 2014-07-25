@@ -165,16 +165,7 @@ public class ShowCommonDataFragment extends AbstractShowDataFragment {
             mFavButton.setVisibility(row != null ? View.VISIBLE : View.INVISIBLE);
             mShowStatistics.setVisibility(row != null ? View.VISIBLE : View.INVISIBLE);
             if(row != null) {
-                // update grid
                 final Favorite toPersist = createFavForStudent(position);
-                try {
-                    final StudentInfo stInfo = retrieveStatistics(toPersist, mStudents);
-                    updateGrid(toPersist, stInfo);
-                } catch (ParseException e) {
-                    Toast.makeText(getActivity(), R.string.wrong_data, Toast.LENGTH_SHORT).show();
-                } catch (NullPointerException e) {
-                    Toast.makeText(getActivity(), R.string.wrong_page_format, Toast.LENGTH_SHORT).show();
-                }
 
                 // update favorite button state
                 try {
@@ -191,6 +182,15 @@ public class ShowCommonDataFragment extends AbstractShowDataFragment {
                     Toast.makeText(getActivity(), R.string.database_error, Toast.LENGTH_SHORT).show();
                 }
 
+                // update grid
+                try {
+                    final StudentInfo stInfo = retrieveStatistics(toPersist, mStudents);
+                    updateGrid(toPersist, stInfo);
+                } catch (ParseException e) {
+                    Toast.makeText(getActivity(), R.string.wrong_data, Toast.LENGTH_SHORT).show();
+                } catch (NullPointerException e) {
+                    Toast.makeText(getActivity(), R.string.wrong_page_format, Toast.LENGTH_SHORT).show();
+                }
             } else
                 clearGrid();
         }

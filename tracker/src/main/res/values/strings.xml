@@ -3,7 +3,7 @@
     <string name="app_name">Поступалка</string>
     <string name="action_settings">Настройки</string>
     <string name="select_institution">Выберите ВУЗ</string>
-    <string name="spbu">СПбГУ (ранж. списков ещё нет)</string>
+    <string name="spbu">СПбГУ</string>
     <string name="spb_gmu">СПб ГМУ</string>
     <string name="itmo">ИТМО</string>
     <string name="network_error">Ошибка сети</string>
@@ -68,4 +68,8 @@
         ВИДА или ПРИГОДНОСТИ ДЛЯ ОПРЕДЕЛЕННЫХ ЦЕЛЕЙ. Подробнее см. в Стандартной общественной лицензии GNU. \n Вы должны
         были получить копию Стандартной общественной лицензии GNU вместе с этой программой. Если это не так, см.
         http://www.gnu.org/licenses/</string>
+    <string name="total">Всего</string>
+    <string name="without_exams">Без испытаний / вне конкурса</string>
+    <string name="contest">На конкурсной основе</string>
+    <string name="select_budget_count">Выберите количество бюджетных мест</string>
 </resources>
