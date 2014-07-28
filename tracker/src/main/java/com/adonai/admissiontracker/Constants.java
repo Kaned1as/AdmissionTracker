@@ -20,7 +20,7 @@ public class Constants {
     // URLs
     public enum University {
         NONE,
-        SPBU("https://cabinet.spbu.ru/Lists/1k_EntryLists/", new SimpleDateFormat("dd.MM.yyyy")),
+        SPBU("https://cabinet.spbu.ru/Lists/1k_FirstWave/", new SimpleDateFormat("dd.MM.yyyy")),
         SPB_GMU("http://194.226.204.24/abit/statsAll.htm", null),
         ITMO("http://abit.ifmo.ru/ru/stat/172/stat_172.htm", null);
 

@@ -48,7 +48,7 @@
     <string name="better_than_me">Лучше меня:</string>
     <string name="select_statistics">Выберите режим статистики</string>
     <string name="originals_above">Оригиналов выше</string>
-    <string name="copies_above">Копий выше</string>
+    <string name="copies_above">Копий документов</string>
     <string name="reclaimed_above">Забравших документы выше</string>
     <string name="total_submitted">Всего подано</string>
     <string name="reclaimed_today">Забрано документов сегодня</string>
@@ -72,4 +72,5 @@
     <string name="without_exams">Без испытаний / вне конкурса</string>
     <string name="contest">На конкурсной основе</string>
     <string name="select_budget_count">Выберите количество бюджетных мест</string>
+    <string name="favs_invalidated">Формат списков изменён ВУЗом, пожалуйста, пересоздайте закладки! Приносим извинения за доставленные неудобства.</string>
 </resources>

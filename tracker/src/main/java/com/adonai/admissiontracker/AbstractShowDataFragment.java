@@ -113,7 +113,7 @@ public abstract class AbstractShowDataFragment extends BaseFragment implements D
     }
 
     protected Element findRowWithName(Elements table, String name) throws ParseException {
-        for(Element row : table)
+        for(final Element row : table)
             if(extractNameForStudent(row).equals(name))
                 return row;
 

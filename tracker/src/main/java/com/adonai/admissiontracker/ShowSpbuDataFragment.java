@@ -50,7 +50,7 @@ public class ShowSpbuDataFragment extends AbstractShowDataFragment {
     private Elements mStudents = null;
 
     private ToggleButton mFavButton;
-    private DoubleTextView mListNumber, mAdmissionDate, mPoints, mOriginalsAbove, mCopiesAbove, mReclaimedAbove;
+    private DoubleTextView mListNumber, mPriority, mPoints, mOriginalsAbove, mCopiesAbove, mReclaimedAbove;
     private DoubleTextView mLastTimestamp, mTotalReclaimed, mNeededPoints;
 
     private NameSelectorListener mNameSelectorListener = new NameSelectorListener();
@@ -91,7 +91,7 @@ public class ShowSpbuDataFragment extends AbstractShowDataFragment {
         mFavButton.setOnCheckedChangeListener(mFavClickListener);
 
         mListNumber = (DoubleTextView) rootView.findViewById(R.id.list_number);
-        mAdmissionDate = (DoubleTextView) rootView.findViewById(R.id.date);
+        mPriority = (DoubleTextView) rootView.findViewById(R.id.priority);
         mPoints = (DoubleTextView) rootView.findViewById(R.id.points);
 
         mOriginalsAbove = (DoubleTextView) rootView.findViewById(R.id.originals);
@@ -157,13 +157,13 @@ public class ShowSpbuDataFragment extends AbstractShowDataFragment {
 
     private void updateGrid(Favorite fav, StudentInfo stInfo) throws ParseException {
         mListNumber.setText((mStudents.indexOf(findRowWithName(mStudents, fav.getName())) + 1) + "/" + stInfo.stats.getTotalSubmitted());
-        mAdmissionDate.setText(SPBU.getTimeFormat().format(stInfo.admissionDate));
+        mPriority.setText(fav.getPriority().toString());
         mPoints.setText(fav.getPoints().toString());
         mOriginalsAbove.setText(stInfo.stats.getOriginalsAbove().toString());
         mCopiesAbove.setText(stInfo.stats.getCopiesAbove().toString());
-        mReclaimedAbove.setText("0");
+        mReclaimedAbove.setText(stInfo.stats.getReclaimedAbove().toString());
         mLastTimestamp.setText(Constants.VIEW_FORMAT.format(stInfo.stats.getTimestamp()));
-        mTotalReclaimed.setText("0");
+        mTotalReclaimed.setText(stInfo.stats.getReclaimedToday().toString());
         if(fav.getMaxBudgetCount() == 0) {
             mNeededPoints.setText("?");
             mNeededPoints.setTextColor(Color.RED);
@@ -220,7 +220,7 @@ public class ShowSpbuDataFragment extends AbstractShowDataFragment {
 
     private void clearGrid() {
         mListNumber.setText("");
-        mAdmissionDate.setText("");
+        mPriority.setText("");
         mPoints.setText("");
         mOriginalsAbove.setText("");
         mCopiesAbove.setText("");
@@ -238,34 +238,44 @@ public class ShowSpbuDataFragment extends AbstractShowDataFragment {
 
         final Element myRow = findRowWithName(data, fav.getName());
         final Elements myColumns = myRow.children();
-        final Date currentAdmissionDate = SPBU.getTimeFormat().parse(myColumns.get(6).text());
 
         currentStatistics.setTotalSubmitted(data.size());
         currentStatistics.setTimestamp(new Date(mLastUpdated));
 
-        final String myType = myColumns.get(4).text();
+        final String myType = myColumns.get(6).text();
 
-        int originalsAbove = 0; // fix when needed
-        int copiesAbove = 0; // fix when needed
-        Integer maxBudget = fav.getMaxBudgetCount(); //fav.getMaxBudgetCount();
+        int originalsAbove = 0;
+        int copiesAbove = 0;
+        int reclaimedAbove = 0;
+        int totalReclaimed = 0;
+        Integer maxBudget = fav.getMaxBudgetCount();
         final Queue<Integer> allPoints = new PriorityQueue<>(data.size(), Collections.reverseOrder());
         for(Element row : data) {
             final Elements columns = row.children();
             final int points = columns.get(5).text().isEmpty() ? 0 : Integer.valueOf(columns.get(5).text());
-            final String type = columns.get(4).text();
-            //final boolean isOriginal = columns.get(6).text().equals("да");
-            if(type.equals("в/к") || type.equals("б/э")) { // отнимаем от бюджетных мест
+            final String type = columns.get(6).text();
+            final boolean isOriginal = columns.get(8).text().equals("Да");
+            final boolean isReclaimed = !columns.get(8).text().matches("Да|Нет");
+            final boolean isCheater = type.equals("в/к") || type.equals("б/э");
+
+            if(isReclaimed)
+                ++totalReclaimed;
+
+            if(isCheater) { // отнимаем от бюджетных мест
                 --maxBudget;
-                ++originalsAbove;
+                if(isOriginal)
+                    ++originalsAbove;
             }
 
             if(type.equals(myType)) {
                 allPoints.offer(points);
-                if (points > fav.getPoints()) {
-                    //if (isOriginal)
-                    //    originalsAbove++;
-                    //else
-                        copiesAbove++;
+                if (points > fav.getPoints() || points == fav.getPoints() && data.indexOf(row) < data.indexOf(myRow)) {
+                    if (isOriginal)
+                        ++originalsAbove;
+                    else if(isReclaimed)
+                        ++reclaimedAbove;
+                    else
+                        ++copiesAbove;
                 }
             }
         }
@@ -273,15 +283,16 @@ public class ShowSpbuDataFragment extends AbstractShowDataFragment {
         int neededPoints = 0;
         while (allPoints.size() > 0 && maxBudget > 0) {
             neededPoints = allPoints.poll();
-            maxBudget--;
+            --maxBudget;
         }
 
         currentStatistics.setCopiesAbove(copiesAbove);
         currentStatistics.setOriginalsAbove(originalsAbove);
         currentStatistics.setNeededPoints(neededPoints);
+        currentStatistics.setReclaimedAbove(reclaimedAbove);
+        currentStatistics.setReclaimedToday(totalReclaimed);
 
         result.stats = currentStatistics;
-        result.admissionDate = currentAdmissionDate;
 
         return result;
     }
@@ -359,7 +370,8 @@ public class ShowSpbuDataFragment extends AbstractShowDataFragment {
         final Favorite toCreate = new Favorite(getArguments().getString(TITLE_KEY), getArguments().getString(URL_KEY));
         toCreate.setParentInstitution(SPBU.ordinal());
         toCreate.setName(extractNameForStudent(row));
-        toCreate.setPoints( columns.get(5).text().isEmpty() ? 0 : Integer.valueOf(columns.get(5).text()));
+        toCreate.setPriority(Integer.valueOf(columns.get(7).text()));
+        toCreate.setPoints(columns.get(5).text().isEmpty() ? 0 : Integer.valueOf(columns.get(5).text()));
         toCreate.setMaxBudgetCount(mBudgetCount);
 
         return toCreate;
@@ -368,6 +380,6 @@ public class ShowSpbuDataFragment extends AbstractShowDataFragment {
     @Override
     protected String extractNameForStudent(Element row) {
         final Elements columns = row.children();
-        return Utils.join(Arrays.asList(columns.get(1).text(), columns.get(2).text(), columns.get(3).text()), " ");
+        return Utils.join(Arrays.asList(columns.get(2).text(), columns.get(3).text(), columns.get(4).text()), " ");
     }
 }
