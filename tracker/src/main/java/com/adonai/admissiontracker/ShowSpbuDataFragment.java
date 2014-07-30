@@ -257,26 +257,24 @@ public class ShowSpbuDataFragment extends AbstractShowDataFragment {
             final boolean isOriginal = columns.get(8).text().equals("Да");
             final boolean isReclaimed = !columns.get(8).text().matches("Да|Нет");
             final boolean isCheater = type.equals("в/к") || type.equals("б/э");
+            final boolean isBetter = points > fav.getPoints() || points == fav.getPoints() && data.indexOf(row) < data.indexOf(myRow);
 
-            if(isReclaimed)
+            if(isReclaimed) { // забрал документы - не в счёт
                 ++totalReclaimed;
-
-            if(isCheater) { // отнимаем от бюджетных мест
-                --maxBudget;
-                if(isOriginal)
-                    ++originalsAbove;
+                if(isBetter || isCheater)
+                    ++reclaimedAbove;
+                continue;
             }
 
-            if(type.equals(myType)) {
-                allPoints.offer(points);
-                if (points > fav.getPoints() || points == fav.getPoints() && data.indexOf(row) < data.indexOf(myRow)) {
-                    if (isOriginal)
-                        ++originalsAbove;
-                    else if(isReclaimed)
-                        ++reclaimedAbove;
-                    else
-                        ++copiesAbove;
-                }
+            if(isCheater)
+                --maxBudget;
+
+            allPoints.offer(points);
+            if (isCheater || isBetter) { // отнимаем от бюджетных мест
+                if (isOriginal)
+                    ++originalsAbove;
+                else
+                    ++copiesAbove;
             }
         }
 
